@@ -30,28 +30,29 @@ class AutoTimeOut extends Command
         $this->info('Starting auto time out process...');
         
         // Find all incomplete records from previous days
-        $incompleteRecords = TimeRecord::whereNull('time_out')
-            ->whereDate('time_in', '<', now()->format('Y-m-d'))
+        $incompleteRecords = TimeRecord::whereNull('afternoon_time_out')
+            ->whereDate('created_at', '<', now()->format('Y-m-d'))
             ->get();
         
         $count = 0;
         
         foreach ($incompleteRecords as $record) {
-            // Set time out to 11:59 PM of the time_in day
-            $timeOut = $record->time_in->copy()->setTime(23, 59, 59);
-            $record->time_out = $timeOut;
+            // Set time out to 11:59 PM of the created_at day
+            $timeOut = $record->created_at->copy()->setTime(23, 59, 59);
+            $record->afternoon_time_out = $timeOut;
+            $record->status = 'COMPLETED';
             $record->calculateTotalHours();
             $record->save();
             
             $count++;
             
-            $this->line("Auto timed out: {$record->full_name} - {$record->time_in->format('Y-m-d')} to {$timeOut->format('H:i')}");
+            $this->line("Auto timed out: {$record->full_name} - {$record->created_at->format('Y-m-d')} to {$timeOut->format('H:i')}");
             
             // Log the auto time out
             Log::info("Auto time out completed", [
                 'user_id' => $record->user_id,
                 'full_name' => $record->full_name,
-                'time_in' => $record->time_in,
+                'created_at' => $record->created_at,
                 'auto_time_out' => $timeOut,
                 'total_hours' => $record->total_hours
             ]);

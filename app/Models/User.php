@@ -37,7 +37,7 @@ class User extends Authenticatable
 
     public function activeTimeRecord()
     {
-        return $this->hasOne(TimeRecord::class)->whereNull('time_out');
+        return $this->hasOne(TimeRecord::class)->whereNull('afternoon_time_out')->whereNotNull('morning_time_in');
     }
 
     public function isAdmin()

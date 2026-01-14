@@ -16,7 +16,7 @@ class TimeRecordController extends Controller
     public function index()
     {
         $records = TimeRecord::with([])
-            ->orderBy('time_in', 'desc')
+            ->orderBy('morning_time_in', 'desc')
             ->paginate(50);
         
         return view('time-records.index', compact('records'));
@@ -33,11 +33,7 @@ class TimeRecordController extends Controller
         if ($request->has('action')) {
             $action = $request->action;
             
-            if ($action === 'time_in') {
-                return $this->handleTimeIn($request);
-            } elseif ($action === 'time_out') {
-                return $this->handleTimeOut($request);
-            } elseif ($action === 'morning_time_in') {
+            if ($action === 'morning_time_in') {
                 return $this->handleMorningTimeIn($request);
             } elseif ($action === 'morning_time_out') {
                 return $this->handleMorningTimeOut($request);
@@ -45,89 +41,15 @@ class TimeRecordController extends Controller
                 return $this->handleAfternoonTimeIn($request);
             } elseif ($action === 'afternoon_time_out') {
                 return $this->handleAfternoonTimeOut($request);
+            } else {
+                return redirect()->route('time-records.form')
+                    ->with('error', 'Invalid action specified');
             }
         }
         
-        // Handle form submission (submit button)
-        if ($request->has('submit_form')) {
-            return $this->handleSubmit($request);
-        }
-        
-        return redirect()->route('time-records.form')
-            ->with('error', 'No action specified.');
+        return $this->handleSubmit($request);
     }
     
-    private function handleTimeIn(Request $request)
-    {
-        // Check if user is already timed in today
-        $todayRecord = TimeRecord::where('user_id', auth()->id())
-            ->whereDate('time_in', now()->format('Y-m-d'))
-            ->orderBy('created_at', 'desc')
-            ->first();
-        
-        if ($todayRecord && $todayRecord->status === 'TIMED_IN') {
-            return redirect()->route('time-records.form')
-                ->with('error', 'You are already timed in today!');
-        }
-        
-        // Get user information
-        $user = auth()->user();
-        
-        // Debug: Log user information
-        \Log::info('User ID: ' . $user->id);
-        \Log::info('User Name: ' . ($user->name ?? 'NULL'));
-        \Log::info('User Position: ' . ($user->position ?? 'NULL'));
-        \Log::info('User Division: ' . ($user->division ?? 'NULL'));
-        
-        // Create or update time in record
-        if ($todayRecord) {
-            // Update existing record
-            $todayRecord->update([
-                'time_in' => now(),
-                'status' => 'TIMED_IN'
-            ]);
-        } else {
-            // Create new time in record
-            TimeRecord::create([
-                'user_id' => $user->id,
-                'full_name' => $user->name ?? 'Unknown User',
-                'position' => $user->position ?? 'Unknown Position',
-                'division' => $user->division ?? 'Unknown Division',
-                'time_in' => now(),
-                'status' => 'TIMED_IN'
-            ]);
-        }
-        
-        return redirect()->route('time-records.form')
-            ->with('success', 'Time In recorded successfully!');
-    }
-    
-    private function handleTimeOut(Request $request)
-    {
-        // Find today's time in record
-        $todayRecord = TimeRecord::where('user_id', auth()->id())
-            ->whereDate('time_in', now()->format('Y-m-d'))
-            ->where('status', 'TIMED_IN')
-            ->first();
-        
-        if (!$todayRecord) {
-            return redirect()->route('time-records.form')
-                ->with('error', 'Please time in first!');
-        }
-        
-        // Update time out
-        $todayRecord->update([
-            'time_out' => now(),
-            'status' => 'COMPLETED'
-        ]);
-        
-        // Calculate total hours
-        $todayRecord->calculateTotalHours();
-        
-        return redirect()->route('time-records.form')
-            ->with('success', 'Time out recorded successfully!');
-    }
-
     private function handleMorningTimeIn(Request $request)
     {
         // Find today's record or create new one
@@ -140,7 +62,7 @@ class TimeRecordController extends Controller
         if ($todayRecord) {
             // Update existing record with morning time in
             $todayRecord->update([
-                'morning_time_in' => now()->subHours(16)->setTimezone('Asia/Manila'),
+                'morning_time_in' => now()->setTimezone('Asia/Manila'),
                 'status' => 'TIMED_IN'
             ]);
         } else {
@@ -150,7 +72,7 @@ class TimeRecordController extends Controller
                 'full_name' => $user->name ?? 'Unknown User',
                 'position' => $user->position ?? 'Unknown Position',
                 'division' => $user->division ?? 'Unknown Division',
-                'morning_time_in' => now()->subHours(16)->setTimezone('Asia/Manila'),
+                'morning_time_in' => now()->setTimezone('Asia/Manila'),
                 'status' => 'TIMED_IN'
             ]);
         }
@@ -175,7 +97,7 @@ class TimeRecordController extends Controller
         
         // Update morning time out and set status to available for afternoon session
         $todayRecord->update([
-            'morning_time_out' => now()->subHours(16)->setTimezone('Asia/Manila'),
+            'morning_time_out' => now()->setTimezone('Asia/Manila'),
             'status' => 'TIMED_IN' // Available for afternoon session
         ]);
         
@@ -195,7 +117,7 @@ class TimeRecordController extends Controller
         if ($todayRecord) {
             // Update existing record
             $todayRecord->update([
-                'afternoon_time_in' => now()->subHours(16)->setTimezone('Asia/Manila'),
+                'afternoon_time_in' => now()->setTimezone('Asia/Manila'),
                 'status' => 'TIMED_IN'
             ]);
         } else {
@@ -205,7 +127,7 @@ class TimeRecordController extends Controller
                 'full_name' => $user->name ?? 'Unknown User',
                 'position' => $user->position ?? 'Unknown Position',
                 'division' => $user->division ?? 'Unknown Division',
-                'afternoon_time_in' => now()->subHours(16)->setTimezone('Asia/Manila'),
+                'afternoon_time_in' => now()->setTimezone('Asia/Manila'),
                 'status' => 'TIMED_IN'
             ]);
         }
@@ -230,8 +152,7 @@ class TimeRecordController extends Controller
         
         // Update afternoon time out and complete the day
         $todayRecord->update([
-            'afternoon_time_out' => now()->subHours(16)->setTimezone('Asia/Manila'),
-            'time_out' => now()->subHours(16)->setTimezone('Asia/Manila'), // Final time out
+            'afternoon_time_out' => now()->setTimezone('Asia/Manila'),
             'status' => 'COMPLETED'
         ]);
         
@@ -247,8 +168,10 @@ class TimeRecordController extends Controller
         // Different validation rules for logged-in vs guest users
         if (auth()->check()) {
             $validated = $request->validate([
-                'time_in' => 'required|date',
-                'time_out' => 'nullable|date|after:time_in',
+                'morning_time_in' => 'required|date',
+                'morning_time_out' => 'nullable|date|after:morning_time_in',
+                'afternoon_time_in' => 'nullable|date',
+                'afternoon_time_out' => 'nullable|date|after:afternoon_time_in',
                 'notes' => 'nullable|string|max:1000'
             ]);
             
@@ -262,8 +185,8 @@ class TimeRecordController extends Controller
             // Store time record
             $timeRecord = TimeRecord::create($validated);
             
-            // Set status based on whether time_out is provided
-            if (!$request->time_out) {
+            // Set status based on whether afternoon_time_out is provided
+            if (!$request->afternoon_time_out) {
                 // Time In only - set status to TIMED_IN
                 $timeRecord->status = 'TIMED_IN';
                 $timeRecord->save();
@@ -281,13 +204,15 @@ class TimeRecordController extends Controller
         } else {
             // For guest users, require time in before time out
             $validated = $request->validate([
-                'time_in' => 'required|date',
-                'time_out' => 'nullable|date|after:time_in',
+                'morning_time_in' => 'required|date',
+                'morning_time_out' => 'nullable|date|after:morning_time_in',
+                'afternoon_time_in' => 'nullable|date',
+                'afternoon_time_out' => 'nullable|date|after:afternoon_time_in',
                 'notes' => 'nullable|string|max:1000'
             ]);
             
             // Check if guest is trying to time out without timing in first
-            if ($request->has('time_out') && !$request->has('time_in')) {
+            if ($request->has('afternoon_time_out') && !$request->has('morning_time_in')) {
                 return redirect()->route('time-records.form')
                     ->with('error', 'Please time in first before timing out!');
             }
@@ -295,8 +220,8 @@ class TimeRecordController extends Controller
             // Store time record
             $timeRecord = TimeRecord::create($validated);
             
-            // Set status based on whether time_out is provided
-            if (!$request->time_out) {
+            // Set status based on whether afternoon_time_out is provided
+            if (!$request->afternoon_time_out) {
                 // Time In only - set status to TIMED_IN
                 $timeRecord->status = 'TIMED_IN';
                 $timeRecord->save();
@@ -367,11 +292,11 @@ class TimeRecordController extends Controller
         
         // Date filtering
         if ($request->has('date_from')) {
-            $query->whereDate('time_in', '>=', $request->get('date_from'));
+            $query->whereDate('morning_time_in', '>=', $request->get('date_from'));
         }
         
         if ($request->has('date_to')) {
-            $query->whereDate('time_in', '<=', $request->get('date_to'));
+            $query->whereDate('morning_time_in', '<=', $request->get('date_to'));
         }
         
         // Division filtering
@@ -379,7 +304,7 @@ class TimeRecordController extends Controller
             $query->where('division', $request->get('division'));
         }
         
-        $timeRecords = $query->orderBy('time_in', 'desc')->paginate(10);
+        $timeRecords = $query->orderBy('morning_time_in', 'desc')->paginate(10);
         
         return view('admin.time-records.index', compact('timeRecords'));
     }
@@ -507,16 +432,16 @@ class TimeRecordController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-    public function timeOutUser()
+    public function timeOutUser(Request $request)
     {
         $user = auth()->user();
         $activeRecord = TimeRecord::where('user_id', $user->id)
-            ->whereDate('time_in', now()->format('Y-m-d'))
-            ->whereNull('time_out')
+            ->whereDate('created_at', now()->format('Y-m-d'))
+            ->whereNull('afternoon_time_out')
             ->first();
         
         if ($activeRecord) {
-            $activeRecord->time_out = now();
+            $activeRecord->afternoon_time_out = now();
             $activeRecord->calculateTotalHours();
             
             return redirect()->route('time-records.form')
@@ -550,11 +475,11 @@ class TimeRecordController extends Controller
         }
         
         if ($request->has('date_from') && !empty($request->get('date_from'))) {
-            $query->whereDate('time_in', '>=', $request->get('date_from'));
+            $query->whereDate('created_at', '>=', $request->get('date_from'));
         }
         
         if ($request->has('date_to') && !empty($request->get('date_to'))) {
-            $query->whereDate('time_in', '<=', $request->get('date_to'));
+            $query->whereDate('created_at', '<=', $request->get('date_to'));
         }
         
         if ($request->has('division') && !empty($request->get('division'))) {
@@ -573,7 +498,7 @@ class TimeRecordController extends Controller
             $record->calculateTotalHours();
         }
         
-        $activeRecords = TimeRecord::active()->orderBy('time_in', 'desc')->get();
+        $activeRecords = TimeRecord::active()->orderBy('morning_time_in', 'desc')->get();
         $divisions = TimeRecord::distinct('division')->pluck('division');
         
         // Debug: Log the results
@@ -589,7 +514,7 @@ class TimeRecordController extends Controller
         
         // Calculate total hours per user
         $totalHoursPerUser = TimeRecord::whereNotNull('total_hours')
-            ->whereDate('time_in', now()->format('Y-m-d'))
+            ->whereDate('morning_time_in', now()->format('Y-m-d'))
             ->groupBy('user_id', 'full_name')
             ->selectRaw('user_id, full_name, SUM(total_hours) as total_hours')
             ->get()
@@ -627,11 +552,12 @@ class TimeRecordController extends Controller
     {
         $record = TimeRecord::findOrFail($id);
         
-        if ($record->time_out) {
+        if ($record->afternoon_time_out) {
             return redirect()->back()->with('error', 'This record already has a time out.');
         }
 
-        $record->time_out = now();
+        $record->afternoon_time_out = now()->setTimezone('Asia/Manila');
+        $record->status = 'COMPLETED';
         $record->calculateTotalHours();
 
         return redirect()->back()->with('success', 'Time out recorded successfully!');
@@ -651,14 +577,16 @@ class TimeRecordController extends Controller
             'full_name' => 'required|string|max:255',
             'position' => 'required|string|max:255',
             'division' => 'required|string|max:255',
-            'time_in' => 'required|date',
-            'time_out' => 'nullable|date|after:time_in',
+            'morning_time_in' => 'required|date',
+            'morning_time_out' => 'nullable|date|after:morning_time_in',
+            'afternoon_time_in' => 'nullable|date',
+            'afternoon_time_out' => 'nullable|date|after:afternoon_time_in',
             'notes' => 'nullable|string|max:1000'
         ]);
 
         $record->update($validated);
 
-        if ($record->time_out) {
+        if ($record->afternoon_time_out) {
             $record->calculateTotalHours();
         }
 
@@ -676,32 +604,160 @@ class TimeRecordController extends Controller
     public function viewCsv()
     {
         try {
-            // Simple query without any filters
-            $records = TimeRecord::orderBy('time_in', 'desc')->get();
+            // Debug: Log everything about the request
+            \Log::info('=== PDF EXPORT DEBUG START ===');
+            \Log::info('Full request URL: ' . request()->fullUrl());
+            \Log::info('Query string: ' . request()->getQueryString());
+            \Log::info('All request data: ' . json_encode(request()->all()));
+            \Log::info('Request method: ' . request()->method());
             
-            // Log success
-            \Log::info('View CSV successful, records found: ' . $records->count());
+            // Get date filters from request or session
+            $dateFrom = request('date_from') ?: session('export_filters.date_from');
+            $dateTo = request('date_to') ?: session('export_filters.date_to');
+            $search = request('search') ?: session('export_filters.search');
+            $division = request('division') ?: session('export_filters.division');
             
-            // Create a simple test CSV content
-            $csvContent = "ID,Full Name,Position,Division,Time In,Time Out,Total Hours,Status\n";
-            
-            foreach ($records as $record) {
-                $csvContent .= $record->id . ",";
-                $csvContent .= $record->full_name . ",";
-                $csvContent .= $record->position . ",";
-                $csvContent .= $record->division . ",";
-                $csvContent .= $record->time_in->format('Y-m-d H:i:s') . ",";
-                $csvContent .= ($record->time_out ? $record->time_out->format('Y-m-d H:i:s') : '-') . ",";
-                $csvContent .= ($record->total_hours ? number_format($record->total_hours, 2) : '-') . ",";
-                $csvContent .= ($record->status ?? '-') . "\n";
-            }
-            
-            // Return as plain text to view in browser
-            return response($csvContent, 200, [
-                'Content-Type' => 'text/plain',
-                'Content-Disposition' => 'inline; filename="data.csv"'
+            \Log::info('Parameters from request/session:', [
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+                'search' => $search,
+                'division' => $division,
+                'session_filters' => session('export_filters')
             ]);
             
+            // Debug logging
+            \Log::info('PDF Export Debug', [
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+                'search' => $search,
+                'division' => $division,
+                'all_request_params' => request()->all(),
+                'full_url' => request()->fullUrl(),
+                'query_string' => request()->getQueryString()
+            ]);
+            
+            // Build query with filters
+            $query = TimeRecord::query();
+            
+            // Apply search filter
+            if ($search && !empty($search)) {
+                $query->where('full_name', 'like', '%' . $search . '%');
+            }
+            
+            // Apply date filters
+            if ($dateFrom && !empty($dateFrom)) {
+                if (strtotime($dateFrom)) {
+                    $query->whereDate('created_at', '>=', $dateFrom);
+                    \Log::info('Applied date_from filter: ' . $dateFrom);
+                }
+            }
+            
+            if ($dateTo && !empty($dateTo)) {
+                if (strtotime($dateTo)) {
+                    $query->whereDate('created_at', '<=', $dateTo);
+                    \Log::info('Applied date_to filter: ' . $dateTo);
+                }
+            }
+            
+            // Apply division filter
+            if ($division && !empty($division)) {
+                $query->where('division', $division);
+            }
+            
+            // If no filters provided, show only today's records
+            if (!$dateFrom && !$dateTo && !$search && !$division) {
+                $today = now()->format('Y-m-d');
+                \Log::info('No filters provided, defaulting to today: ' . $today);
+                $query->whereDate('created_at', $today);
+            }
+            
+            $records = $query->orderBy('created_at', 'desc')->get();
+
+            // Log success
+            \Log::info('PDF Export successful, records found: ' . $records->count());
+            \Log::info('Final SQL Query: ' . $query->toSql());
+            // Create HTML content for PDF
+            $htmlContent = "
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    h1 { color: #333; }
+                    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; font-weight: bold; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                </style>
+            </head>
+            <body>
+                <h1>Time Records Report</h1>
+                <p>Generated on: " . date('Y-m-d H:i:s') . "</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Position</th>
+                            <th>Division</th>
+                            <th>Date</th>
+                            <th>Morning In</th>
+                            <th>Morning Out</th>
+                            <th>Afternoon In</th>
+                            <th>Afternoon Out</th>
+                            <th>Time Range</th>
+                            <th>Total Hours</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>";
+            
+            foreach ($records as $record) {
+                // Add time range
+                if ($record->morning_time_in && $record->afternoon_time_out) {
+                    $timeRange = $record->morning_time_in->format('H:i') . ' - ' . $record->afternoon_time_out->format('H:i');
+                } else {
+                    $timeRange = '-';
+                }
+                
+                $htmlContent .= "
+                    <tr>
+                        <td>" . $record->id . "</td>
+                        <td>" . htmlspecialchars($record->full_name) . "</td>
+                        <td>" . htmlspecialchars($record->position) . "</td>
+                        <td>" . htmlspecialchars($record->division) . "</td>
+                        <td>" . ($record->created_at ? $record->created_at->format('Y-m-d') : '-') . "</td>
+                        <td>" . ($record->morning_time_in ? $record->morning_time_in->format('H:i') : '-') . "</td>
+                        <td>" . ($record->morning_time_out ? $record->morning_time_out->format('H:i') : '-') . "</td>
+                        <td>" . ($record->afternoon_time_in ? $record->afternoon_time_in->format('H:i') : '-') . "</td>
+                        <td>" . ($record->afternoon_time_out ? $record->afternoon_time_out->format('H:i') : '-') . "</td>
+                        <td>" . $timeRange . "</td>
+                        <td>" . ($record->total_hours ? $record->getTotalHoursAsTime() : '-') . "</td>
+                        <td>" . htmlspecialchars($record->status ?? '-') . "</td>
+                    </tr>";
+            }
+            
+            $htmlContent .= "
+                    </tbody>
+                </table>
+            </body>
+            </html>";
+            
+            // Generate PDF using DomPDF
+            $options = new \Dompdf\Options();
+            $options->set('defaultFont', 'Arial');
+            $dompdf = new \Dompdf\Dompdf($options);
+            $dompdf->loadHtml($htmlContent);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            
+            // Return as downloadable PDF
+            return response($dompdf->output(), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="time_records_' . date('Y-m-d') . '.pdf"',
+                'Cache-Control' => 'no-cache, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
+            ]);
         } catch (\Exception $e) {
             Log::error('View CSV failed: ' . $e->getMessage());
             return redirect()->back()->with('error', 'View CSV failed: ' . $e->getMessage());
@@ -712,33 +768,37 @@ class TimeRecordController extends Controller
     {
         try {
             // Simple query without any filters
-            $records = TimeRecord::orderBy('time_in', 'desc')->get();
+            $records = TimeRecord::orderBy('created_at', 'desc')->get();
             
-            // Log success
-            \Log::info('Simple export successful, records found: ' . $records->count());
-            
-            // Create a simple test CSV content
-            $csvContent = "ID,Full Name,Position,Division,Time In,Time Out,Total Hours,Status\n";
+            // Create CSV content
+            $csvContent = "ID,Full Name,Position,Division,Date,Morning In,Morning Out,Afternoon In,Afternoon Out,Time Range,Total Hours,Status\n";
             
             foreach ($records as $record) {
                 $csvContent .= $record->id . ",";
-                $csvContent .= $record->full_name . ",";
-                $csvContent .= $record->position . ",";
-                $csvContent .= $record->division . ",";
-                $csvContent .= $record->time_in->format('Y-m-d H:i:s') . ",";
-                $csvContent .= ($record->time_out ? $record->time_out->format('Y-m-d H:i:s') : '-') . ",";
-                $csvContent .= ($record->total_hours ? number_format($record->total_hours, 2) : '-') . ",";
-                $csvContent .= ($record->status ?? '-') . "\n";
+                $csvContent .= '"' . str_replace('"', '""', $record->full_name) . '",';
+                $csvContent .= '"' . str_replace('"', '""', $record->position) . '",';
+                $csvContent .= '"' . str_replace('"', '""', $record->division) . '",';
+                $csvContent .= ($record->created_at ? $record->created_at->format('Y-m-d') : '-') . ",";
+                $csvContent .= ($record->morning_time_in ? $record->morning_time_in->format('H:i') : '-') . ",";
+                $csvContent .= ($record->morning_time_out ? $record->morning_time_out->format('H:i') : '-') . ",";
+                $csvContent .= ($record->afternoon_time_in ? $record->afternoon_time_in->format('H:i') : '-') . ",";
+                $csvContent .= ($record->afternoon_time_out ? $record->afternoon_time_out->format('H:i') : '-') . ",";
+                
+                // Add time range
+                if ($record->morning_time_in && $record->afternoon_time_out) {
+                    $timeRange = $record->morning_time_in->format('H:i') . ' - ' . $record->afternoon_time_out->format('H:i');
+                } else {
+                    $timeRange = '-';
+                }
+                $csvContent .= '"' . $timeRange . '",';
+                
+                $csvContent .= ($record->total_hours ? $record->getTotalHoursAsTime() : '-') . ",";
+                $csvContent .= '"' . ($record->status ?? '-') . '"' . "\n";
             }
             
-            // Create filename
-            $filename = 'simple_time_records_export_' . date('Y-m-d_H-i-s') . '.csv';
-            
-            // Return as download with proper headers
             return response($csvContent, 200, [
                 'Content-Type' => 'text/csv',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-                'Content-Length' => strlen($csvContent),
+                'Content-Disposition' => 'attachment; filename="time_records_' . date('Y-m-d') . '.csv"',
                 'Cache-Control' => 'no-cache, must-revalidate',
                 'Pragma' => 'no-cache',
                 'Expires' => '0'
@@ -751,18 +811,59 @@ class TimeRecordController extends Controller
         }
     }
 
+    public function storeExportFilters(Request $request)
+    {
+        try {
+            $filters = [
+                'date_from' => $request->get('dateFrom'),
+                'date_to' => $request->get('dateTo'),
+                'division' => $request->get('division'),
+                'search' => $request->get('search')
+            ];
+            
+            session(['export_filters' => $filters]);
+            
+            \Log::info('Export filters stored in session:', $filters);
+            
+            return response()->json(['success' => true, 'filters' => $filters]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Failed to store export filters: ' . $e->getMessage());
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
     public function exportTimeRecords(Request $request)
     {
         try {
+            // Debug: Log everything about the request
+            \Log::info('=== EXPORT DEBUG START ===');
+            \Log::info('Full request URL: ' . $request->fullUrl());
+            \Log::info('Query string: ' . $request->getQueryString());
+            \Log::info('All request data: ' . json_encode($request->all()));
+            \Log::info('Request method: ' . $request->method());
+            \Log::info('Is ajax: ' . ($request->ajax() ? 'yes' : 'no'));
+            
             // Build query - simplified version for debugging
             $query = TimeRecord::query();
             
             // Log request parameters for debugging
-            \Log::info('Export request parameters:', [
-                'search' => $request->get('search'),
-                'date_from' => $request->get('date_from'),
-                'date_to' => $request->get('date_to'),
-                'division' => $request->get('division'),
+            $dateFrom = request('date_from') ?: session('export_filters.date_from');
+            $dateTo = request('date_to') ?: session('export_filters.date_to');
+            $search = request('search') ?: session('export_filters.search');
+            $division = request('division') ?: session('export_filters.division');
+            
+            \Log::info('Excel Export parameters from request/session:', [
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+                'search' => $search,
+                'division' => $division,
+                'has_search' => $request->has('search'),
+                'has_date_from' => $request->has('date_from'),
+                'has_date_to' => $request->has('date_to'),
+                'has_division' => $request->has('division'),
+                'all_params' => $request->all(),
+                'session_filters' => session('export_filters')
             ]);
             
             // Apply filters with better validation
@@ -775,14 +876,14 @@ class TimeRecordController extends Controller
             if ($request->has('date_from') && !empty($request->get('date_from'))) {
                 $dateFrom = $request->get('date_from');
                 if (strtotime($dateFrom)) {
-                    $query->whereDate('time_in', '>=', $dateFrom);
+                    $query->whereDate('created_at', '>=', $dateFrom);
                 }
             }
             
             if ($request->has('date_to') && !empty($request->get('date_to'))) {
                 $dateTo = $request->get('date_to');
                 if (strtotime($dateTo)) {
-                    $query->whereDate('time_in', '<=', $dateTo);
+                    $query->whereDate('created_at', '<=', $dateTo);
                 }
             }
             
@@ -790,11 +891,22 @@ class TimeRecordController extends Controller
                 $query->where('division', $request->get('division'));
             }
             
-            // Get records
-            $records = $query->orderBy('time_in', 'desc')->get();
+            // If no filters applied, show only today's records
+            if (!$request->has('search') && !$request->has('date_from') && !$request->has('date_to') && !$request->has('division')) {
+                $today = now()->format('Y-m-d');
+                \Log::info('No export filters provided, defaulting to today: ' . $today);
+                $query->whereDate('created_at', $today);
+            }
             
-            // Log success
-            \Log::info('Export query successful, records found: ' . $records->count());
+            // Get records
+            $records = $query->orderBy('created_at', 'desc')->get();
+            
+            // Log success with query details
+            \Log::info('Excel Export query successful:', [
+                'records_found' => $records->count(),
+                'sql_query' => $query->toSql(),
+                'query_bindings' => $query->getBindings()
+            ]);
             
             // Prepare CSV data
             $csvData = [];
@@ -802,31 +914,39 @@ class TimeRecordController extends Controller
                 'ID', 
                 'Full Name', 
                 'Position', 
-                'Division', 
-                'Time In', 
-                'Time Out', 
-                'Total Hours', 
-                'Status',
-                'Morning Time In',
-                'Morning Time Out', 
-                'Afternoon Time In', 
-                'Afternoon Time Out'
+                'Division',
+                'Date',
+                'Morning In',
+                'Morning Out',
+                'Afternoon In',
+                'Afternoon Out',
+                'Time Range',
+                'Total Hours',
+                'Status'
             ];
             
+            // Add data rows
             foreach ($records as $record) {
+                // Add time range
+                if ($record->morning_time_in && $record->afternoon_time_out) {
+                    $timeRange = $record->morning_time_in->format('H:i') . ' - ' . $record->afternoon_time_out->format('H:i');
+                } else {
+                    $timeRange = '-';
+                }
+                
                 $csvData[] = [
                     $record->id,
                     $record->full_name,
                     $record->position,
                     $record->division,
-                    $record->time_in->format('Y-m-d H:i:s'),
-                    $record->time_out ? $record->time_out->format('Y-m-d H:i:s') : '-',
-                    $record->total_hours ? number_format($record->total_hours, 2) : '-',
-                    $record->status ?? '-',
-                    $record->morning_time_in ? $record->morning_time_in->format('Y-m-d H:i:s') : '-',
-                    $record->morning_time_out ? $record->morning_time_out->format('Y-m-d H:i:s') : '-',
-                    $record->afternoon_time_in ? $record->afternoon_time_in->format('Y-m-d H:i:s') : '-',
-                    $record->afternoon_time_out ? $record->afternoon_time_out->format('Y-m-d H:i:s') : '-'
+                    ($record->created_at ? $record->created_at->format('Y-m-d') : '-'),
+                    ($record->morning_time_in ? $record->morning_time_in->format('H:i') : '-'),
+                    ($record->morning_time_out ? $record->morning_time_out->format('H:i') : '-'),
+                    ($record->afternoon_time_in ? $record->afternoon_time_in->format('H:i') : '-'),
+                    ($record->afternoon_time_out ? $record->afternoon_time_out->format('H:i') : '-'),
+                    $timeRange,
+                    ($record->total_hours ? $record->getTotalHoursAsTime() : '-'),
+                    ($record->status ?? '-')
                 ];
             }
             
@@ -883,7 +1003,7 @@ class TimeRecordController extends Controller
         if ($request->date_from) {
             try {
                 $dateFrom = \Carbon\Carbon::parse($request->date_from);
-                $query->whereDate('time_in', '>=', $dateFrom->format('Y-m-d'));
+                $query->whereDate('created_at', '>=', $dateFrom->format('Y-m-d'));
             } catch (\Exception $e) {
                 // Invalid date format, skip this filter
             }
@@ -892,18 +1012,18 @@ class TimeRecordController extends Controller
         if ($request->date_to) {
             try {
                 $dateTo = \Carbon\Carbon::parse($request->date_to);
-                $query->whereDate('time_in', '<=', $dateTo->format('Y-m-d'));
+                $query->whereDate('created_at', '<=', $dateTo->format('Y-m-d'));
             } catch (\Exception $e) {
                 // Invalid date format, skip this filter
             }
         }
 
-        $records = $query->orderBy('time_in', 'desc')->paginate(50);
+        $records = $query->orderBy('created_at', 'desc')->paginate(50);
         $divisions = TimeRecord::distinct('division')->pluck('division');
         
         // Calculate statistics for filtered results
         $totalToday = $records->count();
-        $activeRecords = TimeRecord::active()->orderBy('time_in', 'desc')->get();
+        $activeRecords = TimeRecord::active()->orderBy('morning_time_in', 'desc')->get();
         $totalActive = $activeRecords->count();
         $totalHoursToday = $records->whereNotNull('total_hours')->sum('total_hours');
         $todayRecords = $records;

@@ -60,29 +60,57 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="time_in" class="block text-sm font-medium text-gray-700 mb-2">
-                        Time In <span class="text-red-500">*</span>
+                    <label for="morning_time_in" class="block text-sm font-medium text-gray-700 mb-2">
+                        Morning Time In <span class="text-red-500">*</span>
                     </label>
                     <input 
                         type="datetime-local" 
-                        id="time_in" 
-                        name="time_in" 
+                        id="morning_time_in" 
+                        name="morning_time_in" 
                         required
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        value="{{ old('time_in', $record->time_in->format('Y-m-d\TH:i')) }}"
+                        value="{{ old('morning_time_in', $record->morning_time_in ? $record->morning_time_in->format('Y-m-d\TH:i') : '') }}"
                     >
                 </div>
 
                 <div>
-                    <label for="time_out" class="block text-sm font-medium text-gray-700 mb-2">
-                        Time Out
+                    <label for="morning_time_out" class="block text-sm font-medium text-gray-700 mb-2">
+                        Morning Time Out
                     </label>
                     <input 
                         type="datetime-local" 
-                        id="time_out" 
-                        name="time_out"
+                        id="morning_time_out" 
+                        name="morning_time_out"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        value="{{ old('time_out', $record->time_out ? $record->time_out->format('Y-m-d\TH:i') : '') }}"
+                        value="{{ old('morning_time_out', $record->morning_time_out ? $record->morning_time_out->format('Y-m-d\TH:i') : '') }}"
+                    >
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="afternoon_time_in" class="block text-sm font-medium text-gray-700 mb-2">
+                        Afternoon Time In
+                    </label>
+                    <input 
+                        type="datetime-local" 
+                        id="afternoon_time_in" 
+                        name="afternoon_time_in"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        value="{{ old('afternoon_time_in', $record->afternoon_time_in ? $record->afternoon_time_in->format('Y-m-d\TH:i') : '') }}"
+                    >
+                </div>
+
+                <div>
+                    <label for="afternoon_time_out" class="block text-sm font-medium text-gray-700 mb-2">
+                        Afternoon Time Out
+                    </label>
+                    <input 
+                        type="datetime-local" 
+                        id="afternoon_time_out" 
+                        name="afternoon_time_out"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        value="{{ old('afternoon_time_out', $record->afternoon_time_out ? $record->afternoon_time_out->format('Y-m-d\TH:i') : '') }}"
                     >
                 </div>
             </div>

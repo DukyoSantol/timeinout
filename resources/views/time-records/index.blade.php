@@ -32,15 +32,15 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $record->full_name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $record->position }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $record->division }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $record->time_in->format('M j, Y H:i') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $record->morning_time_in ? $record->morning_time_in->format('M j, Y H:i') : '-' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $record->time_out ? $record->time_out->format('M j, Y H:i') : '-' }}
+                            {{ $record->afternoon_time_out ? $record->afternoon_time_out->format('M j, Y H:i') : '-' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $record->total_hours ? number_format($record->total_hours, 2) : '-' }}
+                            {{ $record->total_hours ? $record->getTotalHoursAsTime() : '-' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            @if($record->time_out)
+                            @if($record->afternoon_time_out)
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                     Completed
                                 </span>
@@ -53,7 +53,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div class="flex space-x-2">
                                 <a href="{{ route('admin.time-records.edit', $record->id) }}" class="text-blue-600 hover:text-blue-900">Edit</a>
-                                @if(!$record->time_out)
+                                @if(!$record->afternoon_time_out)
                                     <form action="{{ route('admin.time-records.time-out', $record->id) }}" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" class="text-green-600 hover:text-green-900">Time Out</button>

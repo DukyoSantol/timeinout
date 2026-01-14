@@ -3,41 +3,41 @@
 @section('title', 'MGB-XI Mining Portal Login')
 
 @section('content')
-<div class="min-h-screen w-full bg-gradient-to-br from-stone-900 via-stone-800 to-amber-900 relative overflow-hidden">
-    <!-- Mining Background Elements -->
-    <div class="absolute inset-0 opacity-10">
-        <div class="absolute top-10 left-10 text-amber-500 animate-pulse animate-bounce">
-            <svg class="w-32 h-32 transition-all duration-1000 hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+<div class="min-h-screen w-full bg-gradient-to-br from-stone-900 via-stone-900 to-amber-900 relative overflow-hidden">
+    <!-- Mining Background Elements - TEST CHANGE -->
+    <div class="absolute inset-0 opacity-50">
+        <div class="absolute top-10 left-10 text-white opacity-50">
+            <svg class="w-4 h-4 transition-all duration-1000" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
             </svg>
         </div>
-        <div class="absolute bottom-10 right-10 text-amber-600 animate-pulse animate-ping" style="animation-delay: 1s;">
-            <svg class="w-24 h-24 transition-all duration-1500 hover:scale-125" fill="currentColor" viewBox="0 0 24 24">
+        <div class="absolute bottom-10 right-10 text-white opacity-40">
+            <svg class="w-12 h-12 transition-all duration-1500" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6z"/>
             </svg>
         </div>
-        <div class="absolute top-1/2 left-1/4 text-stone-600 animate-spin" style="animation-duration: 20s;">
-            <svg class="w-16 h-16 transition-all duration-2000 hover:scale-150" fill="currentColor" viewBox="0 0 24 24">
+        <div class="absolute top-1/2 left-1/4 text-white opacity-30">
+            <svg class="w-8 h-8 transition-all duration-2000" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
         </div>
-        <div class="absolute top-20 right-1/4 text-amber-400 animate-bounce" style="animation-delay: 2s;">
-            <svg class="w-20 h-20 transition-all duration-3000 hover:scale-120" fill="currentColor" viewBox="0 0 24 24">
+        <div class="absolute top-20 right-1/4 text-white opacity-40">
+            <svg class="w-10 h-10 transition-all duration-3000" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
         </div>
-        <div class="absolute bottom-20 left-1/3 text-stone-500 animate-pulse animate-spin" style="animation-duration: 15s; animation-delay: 3s;">
-            <svg class="w-28 h-28 transition-all duration-2500 hover:scale-130" fill="currentColor" viewBox="0 0 24 24">
+        <div class="absolute bottom-20 left-1/3 text-white opacity-30">
+            <svg class="w-12 h-12 transition-all duration-2500" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
             </svg>
         </div>
-        <div class="absolute top-1/3 right-1/3 text-amber-300 animate-bounce animate-pulse" style="animation-delay: 1.5s;">
-            <svg class="w-12 h-12 transition-all duration-1800 hover:scale-140" fill="currentColor" viewBox="0 0 24 24">
+        <div class="absolute top-1/3 right-1/3 text-white opacity-30">
+            <svg class="w-10 h-10 transition-all duration-1800" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
         </div>
-        <div class="absolute bottom-1/4 right-1/2 text-stone-400 animate-spin" style="animation-duration: 25s; animation-delay: 2.5s;">
-            <svg class="w-18 h-18 transition-all duration-2200 hover:scale-160" fill="currentColor" viewBox="0 0 24 24">
+        <div class="absolute bottom-1/4 right-1/2 text-white opacity-25">
+            <svg class="w-12 h-12 transition-all duration-2200" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
         </div>

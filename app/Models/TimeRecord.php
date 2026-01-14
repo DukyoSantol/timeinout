@@ -14,8 +14,6 @@ class TimeRecord extends Model
         'full_name',
         'position',
         'division',
-        'time_in',
-        'time_out',
         'notes',
         'total_hours',
         'status',  // New field for tracking status
@@ -26,8 +24,6 @@ class TimeRecord extends Model
     ];
 
     protected $casts = [
-        'time_in' => 'datetime',
-        'time_out' => 'datetime',
         'total_hours' => 'decimal:2',
         'timed_in_flag' => 'boolean',
         'status' => 'string',  // TIMED_IN, TIMED_OUT, COMPLETED
@@ -46,45 +42,83 @@ class TimeRecord extends Model
     {
         $totalHours = 0;
         
-        // Calculate morning session hours
+        // Get all valid times and find earliest and latest
+        $times = [];
+        if ($this->morning_time_in) $times[] = $this->morning_time_in;
+        if ($this->morning_time_out) $times[] = $this->morning_time_out;
+        if ($this->afternoon_time_in) $times[] = $this->afternoon_time_in;
+        if ($this->afternoon_time_out) $times[] = $this->afternoon_time_out;
+        
+        if (empty($times)) {
+            $this->total_hours = 0;
+            return;
+        }
+        
+        // Find earliest and latest times
+        $earliestTime = min($times);
+        $latestTime = max($times);
+        
+        // Calculate total hours from earliest to latest time
+        // Handle same-day time ranges properly
+        $totalMinutes = 0;
+        $currentEarliest = $earliestTime;
+        
+        // Add morning session hours
         if ($this->morning_time_in && $this->morning_time_out) {
-            $morningMinutes = $this->morning_time_out->diffInMinutes($this->morning_time_in);
-            $totalHours += $morningMinutes / 60;
+            $morningMinutes = $currentEarliest->diffInMinutes($this->morning_time_out);
+            $totalMinutes += $morningMinutes;
+            $currentEarliest = $this->morning_time_out;
         }
         
-        // Calculate afternoon session hours
+        // Add afternoon session hours
         if ($this->afternoon_time_in && $this->afternoon_time_out) {
-            $afternoonMinutes = $this->afternoon_time_out->diffInMinutes($this->afternoon_time_in);
-            $totalHours += $afternoonMinutes / 60;
+            $afternoonMinutes = $currentEarliest->diffInMinutes($this->afternoon_time_out);
+            $totalMinutes += $afternoonMinutes;
+            $currentEarliest = $this->afternoon_time_out;
         }
         
-        // If only morning time in exists (no time out), calculate from morning time in to now
-        if ($this->morning_time_in && !$this->morning_time_out && !$this->afternoon_time_in) {
-            $currentMinutes = now()->diffInMinutes($this->morning_time_in);
-            $totalHours = $currentMinutes / 60;
-        }
+        $totalHours = $totalMinutes / 60;
         
-        // If morning complete and afternoon time in exists (no time out), calculate from afternoon time in to now
-        if ($this->morning_time_in && $this->morning_time_out && $this->afternoon_time_in && !$this->afternoon_time_out) {
-            $currentMinutes = now()->diffInMinutes($this->afternoon_time_in);
-            $morningMinutes = $this->morning_time_out->diffInMinutes($this->morning_time_in);
-            $totalHours = ($morningMinutes + $currentMinutes) / 60;
-        }
+        // Debug logging
+        \Log::info('Total Hours Calculation Debug', [
+            'earliest_time' => $earliestTime ? $earliestTime->format('H:i:s') : null,
+            'latest_time' => $latestTime ? $latestTime->format('H:i:s') : null,
+            'total_minutes' => $totalMinutes,
+            'total_hours' => $totalHours,
+            'times' => [
+                'morning_time_in' => $this->morning_time_in ? $this->morning_time_in->format('H:i:s') : null,
+                'morning_time_out' => $this->morning_time_out ? $this->morning_time_out->format('H:i:s') : null,
+                'afternoon_time_in' => $this->afternoon_time_in ? $this->afternoon_time_in->format('H:i:s') : null,
+                'afternoon_time_out' => $this->afternoon_time_out ? $this->afternoon_time_out->format('H:i:s') : null,
+            ]
+        ]);
         
         $this->total_hours = round($totalHours, 2);
         $this->save();
         
         return $this->total_hours;
     }
+    
+    public function getTotalHoursAsTime()
+    {
+        if (!$this->total_hours) {
+            return '0:00';
+        }
+        
+        $hours = floor($this->total_hours);
+        $minutes = round(($this->total_hours - $hours) * 60);
+        
+        return sprintf('%02d:%02d', $hours, $minutes);
+    }
 
     public function scopeToday($query)
     {
-        return $query->whereDate('time_in', today());
+        return $query->whereDate('created_at', today());
     }
 
     public function scopeActive($query)
     {
-        return $query->whereNull('time_out');
+        return $query->whereNull('afternoon_time_out')->whereNotNull('morning_time_in');
     }
 
     public function scopeByDivision($query, $division)
@@ -95,16 +129,16 @@ class TimeRecord extends Model
     public static function hasUserTimedInToday($userId)
     {
         return self::where('user_id', $userId)
-            ->whereDate('time_in', now()->format('Y-m-d'))
-            ->where('status', 'TIMED_IN')
+            ->whereDate('created_at', now()->format('Y-m-d'))
+            ->whereNotNull('morning_time_in')
             ->exists();
     }
 
     public static function hasUserCompletedToday($userId)
     {
         return self::where('user_id', $userId)
-            ->whereDate('time_in', now()->format('Y-m-d'))
-            ->where('status', 'COMPLETED')
+            ->whereDate('created_at', now()->format('Y-m-d'))
+            ->whereNotNull('afternoon_time_out')
             ->exists();
     }
 
@@ -112,8 +146,8 @@ class TimeRecord extends Model
     {
         // Create or update a record with timed_in_flag = true
         $existingRecord = self::where('user_id', $userId)
-            ->whereDate('time_in', now()->format('Y-m-d'))
-            ->where('timed_in_flag', true)
+            ->whereDate('created_at', now()->format('Y-m-d'))
+            ->whereNotNull('morning_time_in')
             ->first();
             
         if ($existingRecord) {
@@ -128,7 +162,7 @@ class TimeRecord extends Model
         // Set timed_in_flag = true for today's record (if column exists)
         try {
             $todayRecord = self::where('user_id', $userId)
-                ->whereDate('time_in', now()->format('Y-m-d'))
+                ->whereDate('created_at', now()->format('Y-m-d'))
                 ->orderBy('created_at', 'desc')
                 ->first();
             

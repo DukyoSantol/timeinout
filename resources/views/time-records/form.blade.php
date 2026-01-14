@@ -10,7 +10,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600">Current System Time</p>
-                    <p class="text-2xl font-bold text-gray-800" id="systemTime">{{ now()->subHours(16)->setTimezone('Asia/Manila')->format('l, F j, Y h:i:s A') }}</p>
+                    <p class="text-2xl font-bold text-gray-800" id="systemTime">{{ now()->setTimezone('Asia/Manila')->format('l, F j, Y h:i:s A') }}</p>
                 </div>
                 <div class="text-4xl">🕐</div>
             </div>
@@ -54,8 +54,8 @@
             @if(auth()->check())
                 @php
                     $todayRecords = auth()->user()->timeRecords()->whereDate('created_at', now()->format('Y-m-d'))->get();
-                    $hasTimeInToday = $todayRecords->whereNull('time_out')->isNotEmpty();
-                    $hasCompleteRecord = $todayRecords->whereNotNull('time_out')->isNotEmpty();
+                    $hasTimeInToday = $todayRecords->whereNotNull('morning_time_in')->isNotEmpty();
+                    $hasCompleteRecord = $todayRecords->whereNotNull('afternoon_time_out')->isNotEmpty();
                 @endphp
                 
                 @if(!$hasCompleteRecord)
@@ -128,7 +128,7 @@
             @if(auth()->check())
                 @php
                     $incompleteRecords = auth()->user()->timeRecords()
-                        ->whereNull('time_out')
+                        ->whereNull('afternoon_time_out')
                         ->whereDate('created_at', '<', now()->format('Y-m-d'))
                         ->get();
                 @endphp
@@ -234,7 +234,7 @@
                             <div class="mt-4 bg-green-100 p-3 rounded-lg border border-green-300">
                                 <div class="flex justify-between items-center">
                                     <span class="text-lg font-semibold text-green-800">Total Hours Today:</span>
-                                    <span class="text-xl font-bold text-green-900">{{ number_format($latestRecord->total_hours, 2) }} hours</span>
+                                    <span class="text-xl font-bold text-green-900">{{ $latestRecord->getTotalHoursAsTime() }} hours</span>
                                 </div>
                             </div>
                         @endif
@@ -324,33 +324,45 @@
 
 @push('scripts')
 <script>
-function updateSystemTime() {
-    const now = new Date();
-    // Subtract 16 hours to correct for server time discrepancy and show correct date
-    const correctedTime = new Date(now.getTime() - (16 * 60 * 60 * 1000));
-    const options = {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric',
-        hour12: true,
-        timeZone: 'UTC' // Use UTC since we're manually adjusting
-    };
-    const formattedTime = correctedTime.toLocaleDateString('en-US', options);
-    const systemTimeElement = document.getElementById('systemTime');
-    if (systemTimeElement) {
-        systemTimeElement.textContent = formattedTime;
-    }
-}
+// Simple test first
+console.log('JavaScript is working!');
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('MGB-XI Time In/Out system loaded');
-    updateSystemTime();
-    // Update time every second
-    setInterval(updateSystemTime, 1000);
+    
+    const systemTimeElement = document.getElementById('systemTime');
+    if (!systemTimeElement) {
+        console.error('systemTime element not found!');
+        return;
+    }
+    
+    console.log('systemTime element found:', systemTimeElement);
+    
+    function updateTime() {
+        const now = new Date();
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+            hour12: true,
+            timeZone: 'Asia/Manila'
+        };
+        const formattedTime = now.toLocaleString('en-US', options);
+        systemTimeElement.textContent = formattedTime;
+        console.log('Time updated to:', formattedTime);
+    }
+    
+    // Update immediately
+    updateTime();
+    
+    // Update every second
+    setInterval(updateTime, 1000);
+    
+    console.log('Time updates started successfully');
 });
 </script>
 @endpush

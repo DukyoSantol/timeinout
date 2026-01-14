@@ -45,6 +45,20 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/test-export', [TimeRecordController::class, 'exportTimeRecords'])->name('admin.test.export');
     Route::get('/simple-export', [TimeRecordController::class, 'simpleExport'])->name('admin.simple.export');
     Route::get('/view-csv', [TimeRecordController::class, 'viewCsv'])->name('admin.view.csv');
+    Route::post('/store-export-filters', [TimeRecordController::class, 'storeExportFilters'])->name('admin.store.export.filters');
+    
+    // Debug test route
+    Route::get('/debug-params', function(Request $request) {
+        \Log::info('=== DEBUG ROUTE ===');
+        \Log::info('URL: ' . $request->fullUrl());
+        \Log::info('Query: ' . $request->getQueryString());
+        \Log::info('All params: ' . json_encode($request->all()));
+        return response()->json([
+            'url' => $request->fullUrl(),
+            'query' => $request->getQueryString(),
+            'params' => $request->all()
+        ]);
+    })->name('admin.debug.params');
     Route::delete('/time-records/{id}', [TimeRecordController::class, 'deleteRecord'])->name('admin.time-records.delete');
     Route::get('/users', [TimeRecordController::class, 'indexUsers'])->name('admin.users.index');
     Route::get('/users/create', [TimeRecordController::class, 'createUser'])->name('admin.users.create');
