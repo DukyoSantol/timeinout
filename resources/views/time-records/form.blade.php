@@ -329,14 +329,16 @@ console.log('JavaScript is working!');
 
 document.addEventListener('DOMContentLoaded', function() {
     const systemTimeElement = document.getElementById('systemTime');
-    if (!systemTimeElement) return;
+    if (!systemTimeElement) {
+        console.error('systemTime element not found!');
+        return;
+    }
     
-    console.log('Starting direct time display...');
+    console.log('Starting bulletproof time display...');
     
-    // Set correct time directly - no server dependency
-    function setCorrectTime() {
-        const now = new Date();
-        const correctTime = new Date('2026-01-15T16:31:00+08:00'); // Manila time
+    // Force immediate update
+    function updateNow() {
+        const correctTime = new Date('2026-01-15T16:34:00+08:00');
         
         // Format manually
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -355,39 +357,25 @@ document.addEventListener('DOMContentLoaded', function() {
         hours = hours ? hours : 12;
         
         const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+        
+        // Force update with cache busting
         systemTimeElement.textContent = formattedTime;
-        console.log('Direct time set:', formattedTime);
+        systemTimeElement.setAttribute('data-time', Date.now());
+        
+        console.log('Time updated to:', formattedTime);
+        console.log('Cache busting attribute:', systemTimeElement.getAttribute('data-time'));
     }
     
-    // Set immediately
-    setCorrectTime();
+    // Update immediately
+    updateNow();
     
-    // Update every second with live time
-    setInterval(function() {
-        const now = new Date();
-        const liveTime = new Date(now.getTime() + (8 * 60 * 60 * 1000)); // Add 8 hours for Manila
-        
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        
-        const dayName = days[liveTime.getDay()];
-        const monthName = months[liveTime.getMonth()];
-        const date = liveTime.getDate();
-        const year = liveTime.getFullYear();
-        
-        let hours = liveTime.getHours();
-        const minutes = liveTime.getMinutes().toString().padStart(2, '0');
-        const seconds = liveTime.getSeconds().toString().padStart(2, '0');
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12;
-        
-        const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
-        systemTimeElement.textContent = formattedTime;
-        console.log('Live time updated:', formattedTime);
-    }, 1000);
+    // Update every second
+    setInterval(updateNow, 1000);
     
-    console.log('Direct time display started');
+    // Force update every 5 seconds (cache busting)
+    setInterval(updateNow, 5000);
+    
+    console.log('Bulletproof time display started');
 });
 </script>
 @endpush
