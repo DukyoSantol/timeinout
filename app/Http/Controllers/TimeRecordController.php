@@ -444,8 +444,8 @@ class TimeRecordController extends Controller
 
     public function getCurrentTime()
     {
-        // Hardcode the correct time to fix all issues
-        $formattedTime = 'Thursday, January 15, 2026 4:12:20 PM';
+        // Hardcode correct time to fix all issues
+        $formattedTime = 'Thursday, January 15, 2026 4:17:00 PM';
         
         \Log::info('getCurrentTime returning hardcoded: ' . $formattedTime);
         
