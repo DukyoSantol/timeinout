@@ -328,53 +328,33 @@
 console.log('JavaScript is working!');
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('MGB-XI Time In/Out system loaded');
-    
     const systemTimeElement = document.getElementById('systemTime');
     if (!systemTimeElement) {
         console.error('systemTime element not found!');
         return;
     }
     
-    console.log('systemTime element found:', systemTimeElement);
-    
-    // Force Manila time by creating a fixed time and updating it
-    // Use a known correct time as base
-    const correctManilaTime = new Date('2026-01-15T15:40:00+08:00'); // Force correct Manila time
-    const pageLoadTime = Date.now();
-    
+    // Ultra-simple fix: just use browser's Manila timezone
     function updateTime() {
-        const elapsed = Date.now() - pageLoadTime;
-        const currentTime = new Date(correctManilaTime.getTime() + elapsed);
-        
-        // Format manually
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        
-        const dayName = days[currentTime.getDay()];
-        const monthName = months[currentTime.getMonth()];
-        const date = currentTime.getDate();
-        const year = currentTime.getFullYear();
-        
-        let hours = currentTime.getHours();
-        const minutes = currentTime.getMinutes().toString().padStart(2, '0');
-        const seconds = currentTime.getSeconds().toString().padStart(2, '0');
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12;
-        
-        const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
-        systemTimeElement.textContent = formattedTime;
-        console.log('Forced Manila time:', formattedTime);
+        const now = new Date();
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+            hour12: true,
+            timeZone: 'Asia/Manila'
+        };
+        const timeString = now.toLocaleString('en-US', options);
+        systemTimeElement.textContent = timeString;
+        console.log('Browser Manila time:', timeString);
     }
     
-    // Update immediately
     updateTime();
-    
-    // Update every second
     setInterval(updateTime, 1000);
-    
-    console.log('Forced Manila time updates started');
 });
 </script>
 @endpush
