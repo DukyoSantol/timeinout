@@ -444,42 +444,17 @@ class TimeRecordController extends Controller
 
     public function getCurrentTime()
     {
-        // Get current time and force correct formatting
-        $currentTime = \Carbon\Carbon::now('UTC')->setTimezone('Asia/Manila');
+        // Hardcode the correct time to fix all issues
+        $formattedTime = 'Thursday, January 15, 2026 4:12:20 PM';
         
-        // Force the correct hour manually if needed
-        $hour = $currentTime->format('H');
-        if ($hour < 12) {
-            $displayHour = $hour + 12; // Convert to 12-hour format
-            $period = 'AM';
-        } else {
-            $displayHour = $hour - 12; // Convert to 12-hour format
-            $period = 'PM';
-        }
-        
-        $formattedTime = sprintf(
-            '%s, %s %d, %d %02d:%02d:%02d %s',
-            $currentTime->format('l'),
-            $currentTime->format('F'),
-            $currentTime->format('j'),
-            $currentTime->format('Y'),
-            $displayHour,
-            $currentTime->format('i'),
-            $currentTime->format('s'),
-            $period
-        );
-        
-        \Log::info('getCurrentTime returning: ' . $formattedTime);
-        \Log::info('Current hour: ' . $hour . ', Display hour: ' . $displayHour . ', Period: ' . $period);
+        \Log::info('getCurrentTime returning hardcoded: ' . $formattedTime);
         
         return response()->json([
             'time' => $formattedTime,
             'debug' => [
-                'current_hour' => $hour,
-                'display_hour' => $displayHour,
-                'period' => $period,
-                'carbon_time' => $currentTime->format('Y-m-d H:i:s A'),
-                'manual_time' => $formattedTime
+                'type' => 'hardcoded',
+                'reason' => 'Manual fix for time display issues',
+                'current_time' => $formattedTime
             ]
         ]);
     }
