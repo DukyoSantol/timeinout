@@ -338,46 +338,32 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('systemTime element found:', systemTimeElement);
     
-    // Check if running on localhost
-    const isLocalhost = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' || 
-                       window.location.hostname === '';
-    
-    console.log('Running on localhost:', isLocalhost);
-    
-    // For localhost, use a fixed correct time since local system time is wrong
+    // Force correct Manila time regardless of system time
     function updateTime() {
-        if (isLocalhost) {
-            // On localhost, use a fixed correct Manila time
-            const now = new Date();
-            // Adjust for the time difference (your system is behind)
-            const correctedTime = new Date(now.getTime() + (16 * 60 * 60 * 1000)); // Add 16 hours
-            const options = {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-                second: 'numeric',
-                hour12: true
-            };
-            systemTimeElement.textContent = correctedTime.toLocaleString('en-US', options);
-            console.log('Localhost corrected time:', correctedTime.toLocaleString('en-US', options));
-        } else {
-            // On server, use AJAX to get real server time
-            fetch('{{ route("time-records.get-current-time") }}')
-                .then(response => response.json())
-                .then(data => {
-                    systemTimeElement.textContent = data.time;
-                    console.log('Server time updated to:', data.time);
-                })
-                .catch(error => {
-                    console.error('Error fetching server time:', error);
-                    systemTimeElement.textContent = 'Time sync error...';
-                    setTimeout(updateTime, 5000);
-                });
-        }
+        // Create a fixed base time and update it manually
+        const baseTime = new Date('{{ now()->setTimezone("Asia/Manila")->format("Y-m-d\\TH:i:s") }}');
+        const elapsed = Date.now() - {{ time() * 1000 }}; // Time since page load
+        const currentTime = new Date(baseTime.getTime() + elapsed);
+        
+        // Format manually to avoid any timezone issues
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const dayName = days[currentTime.getDay()];
+        const monthName = months[currentTime.getMonth()];
+        const date = currentTime.getDate();
+        const year = currentTime.getFullYear();
+        
+        let hours = currentTime.getHours();
+        const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+        const seconds = currentTime.getSeconds().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        
+        const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+        systemTimeElement.textContent = formattedTime;
+        console.log('Forced Manila time:', formattedTime);
     }
     
     // Update immediately
@@ -386,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update every second
     setInterval(updateTime, 1000);
     
-    console.log('Time updates started successfully');
+    console.log('Forced Manila time updates started');
 });
 </script>
 @endpush
