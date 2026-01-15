@@ -338,28 +338,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('systemTime element found:', systemTimeElement);
     
-    // Function to get current server time
-    function getServerTime() {
+    // Just use the server time directly - no calculations
+    function updateTime() {
+        // Get fresh server time every second
         fetch('{{ route("time-records.get-current-time") }}')
             .then(response => response.json())
             .then(data => {
                 systemTimeElement.textContent = data.time;
-                console.log('Time updated to:', data.time);
+                console.log('Server time updated to:', data.time);
             })
             .catch(error => {
                 console.error('Error fetching server time:', error);
-                // Fallback to static time if AJAX fails
-                systemTimeElement.textContent = '{{ now()->setTimezone("Asia/Manila")->format("l, F j, Y h:i:s A") }}';
+                // If AJAX fails, keep the initial server time
+                console.log('Using initial server time');
             });
     }
     
     // Update immediately
-    getServerTime();
+    updateTime();
     
     // Update every second
-    setInterval(getServerTime, 1000);
+    setInterval(updateTime, 1000);
     
-    console.log('Time updates started successfully');
+    console.log('Server time updates started successfully');
 });
 </script>
 @endpush
