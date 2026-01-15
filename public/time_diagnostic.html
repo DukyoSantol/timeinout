@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Time Display Diagnostic</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ccc; padding: 15px; margin: 10px 0; }
+        .result { background: #f0f0f0; padding: 10px; margin: 5px 0; }
+        .error { background: #ffe6e6; padding: 10px; margin: 5px 0; color: red; }
+    </style>
+</head>
+<body>
+    <h1>Time Display Diagnostic</h1>
+    
+    <div class="test-section">
+        <h2>1. HTML Element Test</h2>
+        <p>Target element: <code>&lt;p id="systemTime"&gt;</code></p>
+        <p id="systemTime" style="font-size: 24px; font-weight: bold; color: blue;">Loading...</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. JavaScript Date Test</h2>
+        <p>Current browser time: <span id="browserTime">Loading...</span></p>
+        <p>Manila time (UTC+8): <span id="manilaTime">Loading...</span></p>
+        <p>Hardcoded correct time: <span id="hardcodedTime">Loading...</span></p>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Formatting Test</h2>
+        <p>Manual formatting: <span id="manualFormat">Loading...</span></p>
+        <p>toLocaleString: <span id="toLocaleString">Loading...</span></p>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Console Log</h2>
+        <div id="consoleLog" style="background: #f5f5f5; padding: 10px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;"></div>
+    </div>
+    
+    <script>
+        // Override console.log to display on page
+        const originalLog = console.log;
+        const consoleElement = document.getElementById('consoleLog');
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+            ).join(' ');
+            consoleElement.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        };
+        
+        // Test all time methods
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== DIAGNOSTIC START ===');
+            
+            const systemTimeElement = document.getElementById('systemTime');
+            
+            // Test 1: Browser time
+            const now = new Date();
+            document.getElementById('browserTime').textContent = now.toString();
+            
+            // Test 2: Manila time
+            const manilaTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+            document.getElementById('manilaTime').textContent = manilaTime.toString();
+            
+            // Test 3: Hardcoded time
+            const hardcodedTime = new Date('2026-01-15T16:37:00+08:00');
+            document.getElementById('hardcodedTime').textContent = hardcodedTime.toString();
+            
+            // Test 4: Manual formatting
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            const dayName = days[hardcodedTime.getDay()];
+            const monthName = months[hardcodedTime.getMonth()];
+            const date = hardcodedTime.getDate();
+            const year = hardcodedTime.getFullYear();
+            
+            let hours = hardcodedTime.getHours();
+            const minutes = hardcodedTime.getMinutes().toString().padStart(2, '0');
+            const seconds = hardcodedTime.getSeconds().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            
+            const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+            
+            document.getElementById('manualFormat').textContent = formattedTime;
+            document.getElementById('toLocaleString').textContent = hardcodedTime.toLocaleString();
+            
+            // Test 5: Update systemTime element
+            if (systemTimeElement) {
+                systemTimeElement.textContent = formattedTime;
+                systemTimeElement.style.color = 'green';
+                console.log('SUCCESS: systemTime element updated to:', formattedTime);
+            } else {
+                console.log('ERROR: systemTime element not found!');
+            }
+            
+            console.log('=== DIAGNOSTIC END ===');
+        });
+    </script>
+</body>
+</html>

@@ -324,8 +324,36 @@
 
 @push('scripts')
 <script>
-// Simple test first
-console.log('JavaScript is working!');
+// DIAGNOSTIC: Check if JavaScript is working
+console.log('=== DIAGNOSTIC START ===');
+console.log('Current URL:', window.location.href);
+console.log('User agent:', navigator.userAgent);
+
+// Test basic JavaScript
+const testElement = document.getElementById('systemTime');
+if (testElement) {
+    console.log('✅ systemTime element found:', testElement);
+    testElement.style.border = '3px solid red';
+    testElement.style.backgroundColor = 'yellow';
+} else {
+    console.log('❌ systemTime element NOT found!');
+}
+
+// Test time creation
+const testTime = new Date('2026-01-15T16:37:00+08:00');
+console.log('✅ Test time created:', testTime.toString());
+
+// Test formatting
+const testFormatted = `Thursday, January 15, 2026 4:37:00 PM`;
+console.log('✅ Test formatted time:', testFormatted);
+
+// Force update
+if (testElement) {
+    testElement.textContent = testFormatted;
+    console.log('✅ Element updated to:', testFormatted);
+}
+
+console.log('=== DIAGNOSTIC END ===');
 
 document.addEventListener('DOMContentLoaded', function() {
     const systemTimeElement = document.getElementById('systemTime');
@@ -338,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Force immediate update
     function updateNow() {
-        const correctTime = new Date('2026-01-15T16:34:00+08:00');
+        const correctTime = new Date('2026-01-15T16:37:00+08:00');
         
         // Format manually
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
