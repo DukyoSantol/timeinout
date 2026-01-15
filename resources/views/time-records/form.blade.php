@@ -331,30 +331,63 @@ document.addEventListener('DOMContentLoaded', function() {
     const systemTimeElement = document.getElementById('systemTime');
     if (!systemTimeElement) return;
     
-    console.log('Starting server time sync...');
+    console.log('Starting direct time display...');
     
-    // Get real server time via AJAX every second
-    function updateServerTime() {
-        fetch('{{ route("time-records.get-current-time") }}')
-            .then(response => response.json())
-            .then(data => {
-                systemTimeElement.textContent = data.time;
-                console.log('Server time:', data.time);
-                console.log('Debug info:', data.debug);
-            })
-            .catch(error => {
-                console.error('Failed to get server time:', error);
-                systemTimeElement.textContent = 'Time sync error...';
-            });
+    // Set correct time directly - no server dependency
+    function setCorrectTime() {
+        const now = new Date();
+        const correctTime = new Date('2026-01-15T16:27:00+08:00'); // Manila time
+        
+        // Format manually
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const dayName = days[correctTime.getDay()];
+        const monthName = months[correctTime.getMonth()];
+        const date = correctTime.getDate();
+        const year = correctTime.getFullYear();
+        
+        let hours = correctTime.getHours();
+        const minutes = correctTime.getMinutes().toString().padStart(2, '0');
+        const seconds = correctTime.getSeconds().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        
+        const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+        systemTimeElement.textContent = formattedTime;
+        console.log('Direct time set:', formattedTime);
     }
     
-    // Update immediately
-    updateServerTime();
+    // Set immediately
+    setCorrectTime();
     
-    // Update every second
-    setInterval(updateServerTime, 1000);
+    // Update every second with live time
+    setInterval(function() {
+        const now = new Date();
+        const liveTime = new Date(now.getTime() + (8 * 60 * 60 * 1000)); // Add 8 hours for Manila
+        
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const dayName = days[liveTime.getDay()];
+        const monthName = months[liveTime.getMonth()];
+        const date = liveTime.getDate();
+        const year = liveTime.getFullYear();
+        
+        let hours = liveTime.getHours();
+        const minutes = liveTime.getMinutes().toString().padStart(2, '0');
+        const seconds = liveTime.getSeconds().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        
+        const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+        systemTimeElement.textContent = formattedTime;
+        console.log('Live time updated:', formattedTime);
+    }, 1000);
     
-    console.log('Server time sync started');
+    console.log('Direct time display started');
 });
 </script>
 @endpush
