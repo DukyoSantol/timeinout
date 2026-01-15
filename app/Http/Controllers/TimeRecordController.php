@@ -444,26 +444,42 @@ class TimeRecordController extends Controller
 
     public function getCurrentTime()
     {
-        // Get current UTC time and convert to Manila timezone
-        $utcTime = \Carbon\Carbon::now('UTC');
-        $manilaTime = $utcTime->copy()->setTimezone('Asia/Manila');
+        // Get current time and force correct formatting
+        $currentTime = \Carbon\Carbon::now('UTC')->setTimezone('Asia/Manila');
         
-        // Debug: Log what we're actually returning
-        \Log::info('getCurrentTime returning: ' . $manilaTime->format('Y-m-d H:i:s A'));
-        \Log::info('UTC time: ' . $utcTime->format('Y-m-d H:i:s'));
-        \Log::info('Manila time: ' . $manilaTime->format('Y-m-d H:i:s'));
-        \Log::info('24-hour format: ' . $manilaTime->format('H:i'));
+        // Force the correct hour manually if needed
+        $hour = $currentTime->format('H');
+        if ($hour < 12) {
+            $displayHour = $hour + 12; // Convert to 12-hour format
+            $period = 'AM';
+        } else {
+            $displayHour = $hour - 12; // Convert to 12-hour format
+            $period = 'PM';
+        }
+        
+        $formattedTime = sprintf(
+            '%s, %s %d, %d %02d:%02d:%02d %s',
+            $currentTime->format('l'),
+            $currentTime->format('F'),
+            $currentTime->format('j'),
+            $currentTime->format('Y'),
+            $displayHour,
+            $currentTime->format('i'),
+            $currentTime->format('s'),
+            $period
+        );
+        
+        \Log::info('getCurrentTime returning: ' . $formattedTime);
+        \Log::info('Current hour: ' . $hour . ', Display hour: ' . $displayHour . ', Period: ' . $period);
         
         return response()->json([
-            'time' => $manilaTime->format('l, F j, Y h:i:s A'),
+            'time' => $formattedTime,
             'debug' => [
-                'server_time' => date('Y-m-d H:i:s'),
-                'laravel_time' => now()->format('Y-m-d H:i:s'),
-                'manila_time' => $manilaTime->format('Y-m-d H:i:s'),
-                'timezone' => config('app.timezone'),
-                'utc_time' => $utcTime->format('Y-m-d H:i:s'),
-                'manila_24hr' => $manilaTime->format('H:i'),
-                'manila_12hr' => $manilaTime->format('h:i A')
+                'current_hour' => $hour,
+                'display_hour' => $displayHour,
+                'period' => $period,
+                'carbon_time' => $currentTime->format('Y-m-d H:i:s A'),
+                'manual_time' => $formattedTime
             ]
         ]);
     }
