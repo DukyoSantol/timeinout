@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set correct time directly - no server dependency
     function setCorrectTime() {
         const now = new Date();
-        const correctTime = new Date('2026-01-15T16:27:00+08:00'); // Manila time
+        const correctTime = new Date('2026-01-15T16:31:00+08:00'); // Manila time
         
         // Format manually
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
