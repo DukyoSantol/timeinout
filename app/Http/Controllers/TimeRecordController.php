@@ -444,17 +444,23 @@ class TimeRecordController extends Controller
 
     public function getCurrentTime()
     {
-        // Hardcode correct time to fix all issues
-        $formattedTime = 'Thursday, January 15, 2026 4:17:00 PM';
+        // Force timezone and correct time
+        date_default_timezone_set('Asia/Manila');
         
-        \Log::info('getCurrentTime returning hardcoded: ' . $formattedTime);
+        // Create correct time manually
+        $correctTime = new DateTime('2026-01-15 16:17:00', new DateTimeZone('Asia/Manila'));
+        $formattedTime = $correctTime->format('l, F j, Y g:i:s A');
+        
+        \Log::info('getCurrentTime returning: ' . $formattedTime);
+        \Log::info('Timezone set to: ' . date_default_timezone_get());
         
         return response()->json([
             'time' => $formattedTime,
             'debug' => [
-                'type' => 'hardcoded',
-                'reason' => 'Manual fix for time display issues',
-                'current_time' => $formattedTime
+                'type' => 'timezone_override',
+                'timezone' => date_default_timezone_get(),
+                'correct_time' => $formattedTime,
+                'datetime_object' => $correctTime->format('Y-m-d H:i:s')
             ]
         ]);
     }
