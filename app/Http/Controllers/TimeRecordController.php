@@ -444,11 +444,14 @@ class TimeRecordController extends Controller
 
     public function getCurrentTime()
     {
-        // Force correct Manila time
-        $manilaTime = now()->setTimezone('Asia/Manila');
+        // Get current UTC time and convert to Manila timezone
+        $utcTime = \Carbon\Carbon::now('UTC');
+        $manilaTime = $utcTime->copy()->setTimezone('Asia/Manila');
         
         // Debug: Log what we're actually returning
         \Log::info('getCurrentTime returning: ' . $manilaTime->format('Y-m-d H:i:s'));
+        \Log::info('UTC time: ' . $utcTime->format('Y-m-d H:i:s'));
+        \Log::info('Manila time: ' . $manilaTime->format('Y-m-d H:i:s'));
         
         return response()->json([
             'time' => $manilaTime->format('l, F j, Y h:i:s A'),
@@ -456,7 +459,8 @@ class TimeRecordController extends Controller
                 'server_time' => date('Y-m-d H:i:s'),
                 'laravel_time' => now()->format('Y-m-d H:i:s'),
                 'manila_time' => $manilaTime->format('Y-m-d H:i:s'),
-                'timezone' => config('app.timezone')
+                'timezone' => config('app.timezone'),
+                'utc_time' => $utcTime->format('Y-m-d H:i:s')
             ]
         ]);
     }
