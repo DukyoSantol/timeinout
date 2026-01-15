@@ -339,10 +339,12 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('systemTime element found:', systemTimeElement);
     
     // Force correct Manila time regardless of system time
+    let pageLoadTime = Date.now(); // Store page load time
+    
     function updateTime() {
         // Create a fixed base time and update it manually
         const baseTime = new Date('{{ now()->setTimezone("Asia/Manila")->format("Y-m-d\\TH:i:s") }}');
-        const elapsed = Date.now() - {{ time() * 1000 }}; // Time since page load
+        const elapsed = Date.now() - pageLoadTime; // Correct elapsed time
         const currentTime = new Date(baseTime.getTime() + elapsed);
         
         // Format manually to avoid any timezone issues
@@ -364,6 +366,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
         systemTimeElement.textContent = formattedTime;
         console.log('Forced Manila time:', formattedTime);
+        console.log('Base time from Laravel:', baseTime.toString());
+        console.log('Elapsed:', elapsed / 1000, 'seconds');
     }
     
     // Update immediately
