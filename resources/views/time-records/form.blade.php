@@ -329,28 +329,34 @@ console.log('JavaScript is working!');
 
 document.addEventListener('DOMContentLoaded', function() {
     const systemTimeElement = document.getElementById('systemTime');
-    if (!systemTimeElement) {
-        console.error('systemTime element not found!');
-        return;
-    }
+    if (!systemTimeElement) return;
     
-    // Ultra-simple fix: just use browser's Manila timezone
+    // Super simple - just get current time and force Manila timezone
     function updateTime() {
         const now = new Date();
-        const options = {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric',
-            second: 'numeric',
-            hour12: true,
-            timeZone: 'Asia/Manila'
-        };
-        const timeString = now.toLocaleString('en-US', options);
-        systemTimeElement.textContent = timeString;
-        console.log('Browser Manila time:', timeString);
+        // Force Manila time by adding 8 hours to UTC
+        const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const manilaTime = new Date(utcTime + (8 * 3600000));
+        
+        // Format it
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const dayName = days[manilaTime.getDay()];
+        const monthName = months[manilaTime.getMonth()];
+        const date = manilaTime.getDate();
+        const year = manilaTime.getFullYear();
+        
+        let hours = manilaTime.getHours();
+        const minutes = manilaTime.getMinutes().toString().padStart(2, '0');
+        const seconds = manilaTime.getSeconds().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        
+        const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+        systemTimeElement.textContent = formattedTime;
+        console.log('Forced Manila time:', formattedTime);
     }
     
     updateTime();
