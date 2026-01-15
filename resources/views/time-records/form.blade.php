@@ -324,51 +324,25 @@
 
 @push('scripts')
 <script>
-// DIAGNOSTIC: Check if JavaScript is working
-console.log('=== DIAGNOSTIC START ===');
-console.log('Current URL:', window.location.href);
-console.log('User agent:', navigator.userAgent);
-
-// Test basic JavaScript
-const testElement = document.getElementById('systemTime');
-if (testElement) {
-    console.log('✅ systemTime element found:', testElement);
-    testElement.style.border = '3px solid red';
-    testElement.style.backgroundColor = 'yellow';
-} else {
-    console.log('❌ systemTime element NOT found!');
-}
-
-// Test time creation
-const testTime = new Date('2026-01-15T16:37:00+08:00');
-console.log('✅ Test time created:', testTime.toString());
-
-// Test formatting
-const testFormatted = `Thursday, January 15, 2026 4:37:00 PM`;
-console.log('✅ Test formatted time:', testFormatted);
-
-// Force update
-if (testElement) {
-    testElement.textContent = testFormatted;
-    console.log('✅ Element updated to:', testFormatted);
-}
-
-console.log('=== DIAGNOSTIC END ===');
-
-document.addEventListener('DOMContentLoaded', function() {
-    const systemTimeElement = document.getElementById('systemTime');
-    if (!systemTimeElement) {
-        console.error('systemTime element not found!');
-        return;
+(function() {
+    'use strict';
+    
+    // Wait for DOM to be ready
+    function waitForElement() {
+        const element = document.getElementById('systemTime');
+        if (element) {
+            console.log('systemTime element found:', element);
+            return element;
+        }
+        console.log('Waiting for systemTime element...');
+        setTimeout(waitForElement, 100);
     }
     
-    console.log('Starting bulletproof time display...');
-    
-    // Force immediate update
-    function updateNow() {
-        const correctTime = new Date('2026-01-15T16:37:00+08:00');
+    // Update time function
+    function updateTime() {
+        const correctTime = new Date('2026-01-15T16:53:00+08:00');
         
-        // Format manually
+        // Manual formatting to avoid any browser issues
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         
@@ -384,27 +358,54 @@ document.addEventListener('DOMContentLoaded', function() {
         hours = hours % 12;
         hours = hours ? hours : 12;
         
-        const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+        const formattedTime = dayName + ', ' + monthName + ' ' + date + ', ' + year + ' ' + hours + ':' + minutes + ':' + seconds + ' ' + ampm;
         
-        // Force update with cache busting
-        systemTimeElement.textContent = formattedTime;
-        systemTimeElement.setAttribute('data-time', Date.now());
-        
-        console.log('Time updated to:', formattedTime);
-        console.log('Cache busting attribute:', systemTimeElement.getAttribute('data-time'));
+        // Multiple update methods to ensure it works
+        if (element) {
+            element.textContent = formattedTime;
+            element.innerText = formattedTime;
+            element.innerHTML = formattedTime;
+            element.style.color = '#0066cc';
+            element.style.backgroundColor = '#ffffcc';
+            element.style.border = '2px solid #0066cc';
+            
+            console.log('Time updated to:', formattedTime);
+            console.log('Element methods used:', {
+                textContent: element.textContent,
+                innerText: element.innerText,
+                innerHTML: element.innerHTML
+            });
+        }
     }
     
-    // Update immediately
-    updateNow();
+    // Start the time display
+    function startTimeDisplay() {
+        console.log('Starting bulletproof time display...');
+        
+        const element = waitForElement();
+        if (element) {
+            // Update immediately
+            updateTime();
+            
+            // Update every second
+            setInterval(updateTime, 1000);
+            
+            // Also update every 5 seconds for extra reliability
+            setInterval(updateTime, 5000);
+            
+            console.log('Time display started with multiple intervals');
+        } else {
+            console.error('Failed to find systemTime element after 10 seconds');
+        }
+    }
     
-    // Update every second
-    setInterval(updateNow, 1000);
-    
-    // Force update every 5 seconds (cache busting)
-    setInterval(updateNow, 5000);
-    
-    console.log('Bulletproof time display started');
-});
+    // Start when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startTimeDisplay);
+    } else {
+        startTimeDisplay();
+    }
+})();
 </script>
 @endpush
 @endsection

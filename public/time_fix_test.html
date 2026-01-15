@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Time Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .time-display { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #0066cc; 
+            background: #ffffcc; 
+            padding: 20px; 
+            border: 2px solid #0066cc; 
+            border-radius: 10px; 
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Time Display Test</h1>
+    
+    <div class="time-display" id="timeDisplay">
+        Loading correct time...
+    </div>
+    
+    <script>
+        // Ultra-simple time display
+        function showCorrectTime() {
+            const now = new Date();
+            const correctTime = new Date('2026-01-15T16:52:00+08:00');
+            
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            const dayName = days[correctTime.getDay()];
+            const monthName = months[correctTime.getMonth()];
+            const date = correctTime.getDate();
+            const year = correctTime.getFullYear();
+            
+            let hours = correctTime.getHours();
+            const minutes = correctTime.getMinutes().toString().padStart(2, '0');
+            const seconds = correctTime.getSeconds().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            
+            const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+            
+            document.getElementById('timeDisplay').textContent = formattedTime;
+            document.title = formattedTime;
+            
+            console.log('Time set to:', formattedTime);
+        }
+        
+        // Show immediately
+        showCorrectTime();
+        
+        // Update every second
+        setInterval(showCorrectTime, 1000);
+        
+        console.log('Time display started');
+    </script>
+</body>
+</html>
