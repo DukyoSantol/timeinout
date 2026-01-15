@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/time-records', [TimeRecordController::class, 'store'])->name('time-records.store');
     Route::post('/time-records/time-out-user', [TimeRecordController::class, 'timeOutUser'])->name('time-records.time-out-user');
     Route::post('/check-timed-in-status', [TimeRecordController::class, 'checkTimedInStatus'])->name('time-records.check-timed-in-status');
+    Route::get('/time-records/get-current-time', [TimeRecordController::class, 'getCurrentTime'])->name('time-records.get-current-time');
 });
 
 // Admin routes (protected + admin check)

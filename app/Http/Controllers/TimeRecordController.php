@@ -442,6 +442,13 @@ class TimeRecordController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+    public function getCurrentTime()
+    {
+        return response()->json([
+            'time' => $this->getManilaTime()->format('l, F j, Y h:i:s A')
+        ]);
+    }
+
     public function timeOutUser(Request $request)
     {
         $user = auth()->user();

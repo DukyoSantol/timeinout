@@ -338,41 +338,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('systemTime element found:', systemTimeElement);
     
-    // Get server time from Laravel
-    const serverTime = new Date('{{ now()->setTimezone('Asia/Manila')->format('Y-m-d\TH:i:s') }}');
-    const clientLoadTime = Date.now();
-    
-    function updateTime() {
-        // Calculate elapsed time since page load and add to server time
-        const elapsed = Date.now() - clientLoadTime;
-        const now = new Date(serverTime.getTime() + elapsed);
-        
-        // Format the time manually to avoid browser timezone issues
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        
-        const dayName = days[now.getDay()];
-        const monthName = months[now.getMonth()];
-        const date = now.getDate();
-        const year = now.getFullYear();
-        
-        let hours = now.getHours();
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        const seconds = now.getSeconds().toString().padStart(2, '0');
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12; // 0 should be 12
-        
-        const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
-        systemTimeElement.textContent = formattedTime;
-        console.log('Time updated to:', formattedTime);
+    // Function to get current server time
+    function getServerTime() {
+        fetch('{{ route("time-records.get-current-time") }}')
+            .then(response => response.json())
+            .then(data => {
+                systemTimeElement.textContent = data.time;
+                console.log('Time updated to:', data.time);
+            })
+            .catch(error => {
+                console.error('Error fetching server time:', error);
+                // Fallback to static time if AJAX fails
+                systemTimeElement.textContent = '{{ now()->setTimezone("Asia/Manila")->format("l, F j, Y h:i:s A") }}';
+            });
     }
     
     // Update immediately
-    updateTime();
+    getServerTime();
     
     // Update every second
-    setInterval(updateTime, 1000);
+    setInterval(getServerTime, 1000);
     
     console.log('Time updates started successfully');
 });
