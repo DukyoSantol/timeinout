@@ -340,10 +340,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 systemTimeElement.textContent = data.time;
                 console.log('Server time:', data.time);
+                console.log('Debug info:', data.debug);
             })
             .catch(error => {
                 console.error('Failed to get server time:', error);
-                // Fallback: show error message
                 systemTimeElement.textContent = 'Time sync error...';
             });
     }

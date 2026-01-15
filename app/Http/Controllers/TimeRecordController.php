@@ -444,8 +444,20 @@ class TimeRecordController extends Controller
 
     public function getCurrentTime()
     {
+        // Force correct Manila time
+        $manilaTime = now()->setTimezone('Asia/Manila');
+        
+        // Debug: Log what we're actually returning
+        \Log::info('getCurrentTime returning: ' . $manilaTime->format('Y-m-d H:i:s'));
+        
         return response()->json([
-            'time' => $this->getManilaTime()->format('l, F j, Y h:i:s A')
+            'time' => $manilaTime->format('l, F j, Y h:i:s A'),
+            'debug' => [
+                'server_time' => date('Y-m-d H:i:s'),
+                'laravel_time' => now()->format('Y-m-d H:i:s'),
+                'manila_time' => $manilaTime->format('Y-m-d H:i:s'),
+                'timezone' => config('app.timezone')
+            ]
         ]);
     }
 
