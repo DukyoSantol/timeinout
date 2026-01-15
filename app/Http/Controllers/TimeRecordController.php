@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\Auth;
 
 class TimeRecordController extends Controller
 {
+    /**
+     * Get current time in Manila timezone
+     */
+    private function getManilaTime()
+    {
+        return now()->setTimezone('Asia/Manila');
+    }
+
     public function index()
     {
         $records = TimeRecord::with([])
@@ -64,7 +72,7 @@ class TimeRecordController extends Controller
         if ($todayRecord) {
             // Update existing record with morning time in
             $todayRecord->update([
-                'morning_time_in' => now()->setTimezone('Asia/Manila'),
+                'morning_time_in' => $this->getManilaTime(),
                 'status' => 'TIMED_IN'
             ]);
         } else {
@@ -74,7 +82,7 @@ class TimeRecordController extends Controller
                 'full_name' => $user->name ?? 'Unknown User',
                 'position' => $user->position ?? 'Unknown Position',
                 'division' => $user->division ?? 'Unknown Division',
-                'morning_time_in' => now()->setTimezone('Asia/Manila'),
+                'morning_time_in' => $this->getManilaTime(),
                 'status' => 'TIMED_IN'
             ]);
         }
@@ -99,7 +107,7 @@ class TimeRecordController extends Controller
         
         // Update morning time out and set status to available for afternoon session
         $todayRecord->update([
-            'morning_time_out' => now()->setTimezone('Asia/Manila'),
+            'morning_time_out' => $this->getManilaTime(),
             'status' => 'TIMED_IN' // Available for afternoon session
         ]);
         
@@ -119,7 +127,7 @@ class TimeRecordController extends Controller
         if ($todayRecord) {
             // Update existing record
             $todayRecord->update([
-                'afternoon_time_in' => now()->setTimezone('Asia/Manila'),
+                'afternoon_time_in' => $this->getManilaTime(),
                 'status' => 'TIMED_IN'
             ]);
         } else {
@@ -129,7 +137,7 @@ class TimeRecordController extends Controller
                 'full_name' => $user->name ?? 'Unknown User',
                 'position' => $user->position ?? 'Unknown Position',
                 'division' => $user->division ?? 'Unknown Division',
-                'afternoon_time_in' => now()->setTimezone('Asia/Manila'),
+                'afternoon_time_in' => $this->getManilaTime(),
                 'status' => 'TIMED_IN'
             ]);
         }
@@ -154,7 +162,7 @@ class TimeRecordController extends Controller
         
         // Update afternoon time out and complete the day
         $todayRecord->update([
-            'afternoon_time_out' => now()->setTimezone('Asia/Manila'),
+            'afternoon_time_out' => $this->getManilaTime(),
             'status' => 'COMPLETED'
         ]);
         
@@ -443,7 +451,7 @@ class TimeRecordController extends Controller
             ->first();
         
         if ($activeRecord) {
-            $activeRecord->afternoon_time_out = now();
+            $activeRecord->afternoon_time_out = $this->getManilaTime();
             $activeRecord->calculateTotalHours();
             
             return redirect()->route('time-records.form')
@@ -558,7 +566,7 @@ class TimeRecordController extends Controller
             return redirect()->back()->with('error', 'This record already has a time out.');
         }
 
-        $record->afternoon_time_out = now()->setTimezone('Asia/Manila');
+        $record->afternoon_time_out = $this->getManilaTime();
         $record->status = 'COMPLETED';
         $record->calculateTotalHours();
 

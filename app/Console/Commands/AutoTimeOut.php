@@ -37,8 +37,8 @@ class AutoTimeOut extends Command
         $count = 0;
         
         foreach ($incompleteRecords as $record) {
-            // Set time out to 11:59 PM of the created_at day
-            $timeOut = $record->created_at->copy()->setTime(23, 59, 59);
+            // Set time out to 11:59 PM of the created_at day in Manila timezone
+            $timeOut = $record->created_at->copy()->setTimezone('Asia/Manila')->setTime(23, 59, 59);
             $record->afternoon_time_out = $timeOut;
             $record->status = 'COMPLETED';
             $record->calculateTotalHours();
