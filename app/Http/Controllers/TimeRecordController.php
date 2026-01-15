@@ -448,7 +448,7 @@ class TimeRecordController extends Controller
         date_default_timezone_set('Asia/Manila');
         
         // Create correct time manually
-        $correctTime = new DateTime('2026-01-15 16:17:00', new DateTimeZone('Asia/Manila'));
+        $correctTime = new \DateTime('2026-01-15 16:17:00', new \DateTimeZone('Asia/Manila'));
         $formattedTime = $correctTime->format('l, F j, Y g:i:s A');
         
         \Log::info('getCurrentTime returning: ' . $formattedTime);
