@@ -338,8 +338,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('systemTime element found:', systemTimeElement);
     
+    // Get server time from Laravel
+    const serverTime = new Date('{{ now()->setTimezone('Asia/Manila')->format('Y-m-d\TH:i:s') }}');
+    const clientLoadTime = Date.now();
+    
     function updateTime() {
-        const now = new Date();
+        // Calculate elapsed time since page load and add to server time
+        const elapsed = Date.now() - clientLoadTime;
+        const now = new Date(serverTime.getTime() + elapsed);
+        
         const options = {
             weekday: 'long',
             year: 'numeric',
