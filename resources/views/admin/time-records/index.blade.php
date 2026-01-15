@@ -67,9 +67,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $record->full_name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $record->position }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $record->division }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $record->time_in->format('Y-m-d H:i') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $record->morning_time_in ? $record->morning_time_in->format('Y-m-d H:i') : '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $record->time_out ? $record->time_out->format('Y-m-d H:i') : '-' }}
+                                {{ $record->afternoon_time_out ? $record->afternoon_time_out->format('Y-m-d H:i') : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $record->total_hours ? number_format($record->total_hours, 2) : '-' }}

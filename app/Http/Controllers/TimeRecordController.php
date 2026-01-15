@@ -33,7 +33,9 @@ class TimeRecordController extends Controller
         if ($request->has('action')) {
             $action = $request->action;
             
-            if ($action === 'morning_time_in') {
+            if ($action === 'time_in') {
+                return $this->handleMorningTimeIn($request);
+            } elseif ($action === 'morning_time_in') {
                 return $this->handleMorningTimeIn($request);
             } elseif ($action === 'morning_time_out') {
                 return $this->handleMorningTimeOut($request);

@@ -75,7 +75,7 @@
                             <button type="submit" name="action" value="time_in" class="px-4 py-2 bg-green-600 text-white rounded">
                                 🕐 Time In
                             </button>
-                            <button type="submit" name="action" value="time_out" class="px-4 py-2 bg-red-600 text-white rounded">
+                            <button type="submit" name="action" value="afternoon_time_out" class="px-4 py-2 bg-red-600 text-white rounded">
                                 🕑 Time Out
                             </button>
                         </div>

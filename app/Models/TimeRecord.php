@@ -175,4 +175,25 @@ class TimeRecord extends Model
             \Log::info('timed_in_flag column not found: ' . $e->getMessage());
         }
     }
+
+    // Backward compatibility accessors
+    public function getTimeInAttribute()
+    {
+        return $this->morning_time_in;
+    }
+
+    public function getTimeOutAttribute()
+    {
+        return $this->afternoon_time_out;
+    }
+
+    public function setTimeInAttribute($value)
+    {
+        $this->attributes['morning_time_in'] = $value;
+    }
+
+    public function setTimeOutAttribute($value)
+    {
+        $this->attributes['afternoon_time_out'] = $value;
+    }
 }
