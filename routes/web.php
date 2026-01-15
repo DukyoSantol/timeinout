@@ -36,6 +36,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/time-test', function() {
         return view('time_test');
     })->name('time.test');
+    Route::get('/simple-time-test', function() {
+        return view('simple_time_test');
+    })->name('simple.time.test');
     Route::post('/time-records', [TimeRecordController::class, 'store'])->name('time-records.store');
     Route::post('/time-records/time-out-user', [TimeRecordController::class, 'timeOutUser'])->name('time-records.time-out-user');
     Route::post('/check-timed-in-status', [TimeRecordController::class, 'checkTimedInStatus'])->name('time-records.check-timed-in-status');
