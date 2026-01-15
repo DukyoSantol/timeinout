@@ -10,7 +10,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600">Current System Time</p>
-                    <p class="text-2xl font-bold text-gray-800" id="systemTime">Loading...</p>
+                    <p class="text-2xl font-bold text-gray-800">
+                        {{ \Carbon\Carbon::now('Asia/Manila')->format('l, F j, Y h:i:s A') }}
+                    </p>
                 </div>
                 <div class="text-4xl">🕐</div>
             </div>
