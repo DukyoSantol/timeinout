@@ -331,36 +331,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const systemTimeElement = document.getElementById('systemTime');
     if (!systemTimeElement) return;
     
-    // Super simple - just get current time and force Manila timezone
-    function updateTime() {
-        const now = new Date();
-        // Force Manila time by adding 8 hours to UTC
-        const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
-        const manilaTime = new Date(utcTime + (8 * 3600000));
-        
-        // Format it
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        
-        const dayName = days[manilaTime.getDay()];
-        const monthName = months[manilaTime.getMonth()];
-        const date = manilaTime.getDate();
-        const year = manilaTime.getFullYear();
-        
-        let hours = manilaTime.getHours();
-        const minutes = manilaTime.getMinutes().toString().padStart(2, '0');
-        const seconds = manilaTime.getSeconds().toString().padStart(2, '0');
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12;
-        
-        const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
-        systemTimeElement.textContent = formattedTime;
-        console.log('Forced Manila time:', formattedTime);
+    console.log('Starting server time sync...');
+    
+    // Get real server time via AJAX every second
+    function updateServerTime() {
+        fetch('{{ route("time-records.get-current-time") }}')
+            .then(response => response.json())
+            .then(data => {
+                systemTimeElement.textContent = data.time;
+                console.log('Server time:', data.time);
+            })
+            .catch(error => {
+                console.error('Failed to get server time:', error);
+                // Fallback: show error message
+                systemTimeElement.textContent = 'Time sync error...';
+            });
     }
     
-    updateTime();
-    setInterval(updateTime, 1000);
+    // Update immediately
+    updateServerTime();
+    
+    // Update every second
+    setInterval(updateServerTime, 1000);
+    
+    console.log('Server time sync started');
 });
 </script>
 @endpush
