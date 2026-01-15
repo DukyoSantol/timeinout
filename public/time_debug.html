@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Time Debug Test</title>
+</head>
+<body>
+    <h1>Time Debug Test</h1>
+    
+    <h2>Server Time (Direct):</h2>
+    <p id="serverTimeDirect">{{ now()->setTimezone('Asia/Manila')->format('l, F j, Y h:i:s A') }}</p>
+    
+    <h2>Server Time (AJAX):</h2>
+    <p id="serverTimeAjax">Loading...</p>
+    
+    <h2>Browser Time:</h2>
+    <p id="browserTime">Loading...</p>
+    
+    <script>
+        // Test AJAX endpoint
+        fetch('/time-records/get-current-time')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('serverTimeAjax').textContent = data.time;
+                console.log('AJAX Time:', data.time);
+            })
+            .catch(error => {
+                console.error('AJAX Error:', error);
+                document.getElementById('serverTimeAjax').textContent = 'AJAX Failed';
+            });
+        
+        // Show browser time
+        function updateBrowserTime() {
+            const now = new Date();
+            document.getElementById('browserTime').textContent = now.toLocaleString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric',
+                hour12: true,
+                timeZone: 'Asia/Manila'
+            });
+        }
+        
+        updateBrowserTime();
+        setInterval(updateBrowserTime, 1000);
+    </script>
+</body>
+</html>

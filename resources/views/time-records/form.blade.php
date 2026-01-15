@@ -10,7 +10,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600">Current System Time</p>
-                    <p class="text-2xl font-bold text-gray-800" id="systemTime">{{ now()->setTimezone('Asia/Manila')->format('l, F j, Y h:i:s A') }}</p>
+                    <p class="text-2xl font-bold text-gray-800" id="systemTime">Loading...</p>
                 </div>
                 <div class="text-4xl">🕐</div>
             </div>
@@ -349,8 +349,9 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error fetching server time:', error);
-                // If AJAX fails, keep the initial server time
-                console.log('Using initial server time');
+                // If AJAX fails, show error but keep trying
+                systemTimeElement.textContent = 'Time sync error...';
+                setTimeout(updateTime, 5000); // Retry after 5 seconds
             });
     }
     
