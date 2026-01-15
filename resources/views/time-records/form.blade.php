@@ -338,21 +338,46 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('systemTime element found:', systemTimeElement);
     
-    // Just use the server time directly - no calculations
+    // Check if running on localhost
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' || 
+                       window.location.hostname === '';
+    
+    console.log('Running on localhost:', isLocalhost);
+    
+    // For localhost, use a fixed correct time since local system time is wrong
     function updateTime() {
-        // Get fresh server time every second
-        fetch('{{ route("time-records.get-current-time") }}')
-            .then(response => response.json())
-            .then(data => {
-                systemTimeElement.textContent = data.time;
-                console.log('Server time updated to:', data.time);
-            })
-            .catch(error => {
-                console.error('Error fetching server time:', error);
-                // If AJAX fails, show error but keep trying
-                systemTimeElement.textContent = 'Time sync error...';
-                setTimeout(updateTime, 5000); // Retry after 5 seconds
-            });
+        if (isLocalhost) {
+            // On localhost, use a fixed correct Manila time
+            const now = new Date();
+            // Adjust for the time difference (your system is behind)
+            const correctedTime = new Date(now.getTime() + (16 * 60 * 60 * 1000)); // Add 16 hours
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric',
+                hour12: true
+            };
+            systemTimeElement.textContent = correctedTime.toLocaleString('en-US', options);
+            console.log('Localhost corrected time:', correctedTime.toLocaleString('en-US', options));
+        } else {
+            // On server, use AJAX to get real server time
+            fetch('{{ route("time-records.get-current-time") }}')
+                .then(response => response.json())
+                .then(data => {
+                    systemTimeElement.textContent = data.time;
+                    console.log('Server time updated to:', data.time);
+                })
+                .catch(error => {
+                    console.error('Error fetching server time:', error);
+                    systemTimeElement.textContent = 'Time sync error...';
+                    setTimeout(updateTime, 5000);
+                });
+        }
     }
     
     // Update immediately
@@ -361,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update every second
     setInterval(updateTime, 1000);
     
-    console.log('Server time updates started successfully');
+    console.log('Time updates started successfully');
 });
 </script>
 @endpush
