@@ -449,9 +449,10 @@ class TimeRecordController extends Controller
         $manilaTime = $utcTime->copy()->setTimezone('Asia/Manila');
         
         // Debug: Log what we're actually returning
-        \Log::info('getCurrentTime returning: ' . $manilaTime->format('Y-m-d H:i:s'));
+        \Log::info('getCurrentTime returning: ' . $manilaTime->format('Y-m-d H:i:s A'));
         \Log::info('UTC time: ' . $utcTime->format('Y-m-d H:i:s'));
         \Log::info('Manila time: ' . $manilaTime->format('Y-m-d H:i:s'));
+        \Log::info('24-hour format: ' . $manilaTime->format('H:i'));
         
         return response()->json([
             'time' => $manilaTime->format('l, F j, Y h:i:s A'),
@@ -460,7 +461,9 @@ class TimeRecordController extends Controller
                 'laravel_time' => now()->format('Y-m-d H:i:s'),
                 'manila_time' => $manilaTime->format('Y-m-d H:i:s'),
                 'timezone' => config('app.timezone'),
-                'utc_time' => $utcTime->format('Y-m-d H:i:s')
+                'utc_time' => $utcTime->format('Y-m-d H:i:s'),
+                'manila_24hr' => $manilaTime->format('H:i'),
+                'manila_12hr' => $manilaTime->format('h:i A')
             ]
         ]);
     }
