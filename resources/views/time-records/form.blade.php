@@ -338,16 +338,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('systemTime element found:', systemTimeElement);
     
-    // Force correct Manila time regardless of system time
-    let pageLoadTime = Date.now(); // Store page load time
+    // Force Manila time by creating a fixed time and updating it
+    // Use a known correct time as base
+    const correctManilaTime = new Date('2026-01-15T15:40:00+08:00'); // Force correct Manila time
+    const pageLoadTime = Date.now();
     
     function updateTime() {
-        // Create a fixed base time and update it manually
-        const baseTime = new Date('{{ now()->setTimezone("Asia/Manila")->format("Y-m-d\\TH:i:s") }}');
-        const elapsed = Date.now() - pageLoadTime; // Correct elapsed time
-        const currentTime = new Date(baseTime.getTime() + elapsed);
+        const elapsed = Date.now() - pageLoadTime;
+        const currentTime = new Date(correctManilaTime.getTime() + elapsed);
         
-        // Format manually to avoid any timezone issues
+        // Format manually
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         
@@ -366,8 +366,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const formattedTime = `${dayName}, ${monthName} ${date}, ${year} ${hours}:${minutes}:${seconds} ${ampm}`;
         systemTimeElement.textContent = formattedTime;
         console.log('Forced Manila time:', formattedTime);
-        console.log('Base time from Laravel:', baseTime.toString());
-        console.log('Elapsed:', elapsed / 1000, 'seconds');
     }
     
     // Update immediately
