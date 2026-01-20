@@ -90,21 +90,74 @@
                 </div>
             </form>
             
-            <!-- Export Section - Separate Form -->
+            <!-- Export Section - With Filters -->
             <div class="mt-4 pt-4 border-t border-gray-200">
-                <form action="{{ route('admin.export') }}" method="GET" class="inline">
-                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm">
-                        📊 Export Excel
-                    </button>
-                </form>
-                <a href="{{ route('admin.view.csv') }}" class="ml-2 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm">
-                    👁️ View CSV
-                </a>
-                <a href="{{ route('admin.simple.export') }}" class="ml-2 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-sm">
-                    📄 Simple Export
-                </a>
+                <div class="mb-3">
+                    <p class="text-sm text-gray-600 mb-2">📊 Export with current filters:</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="exportWithFilters('excel')" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm">
+                            📊 Export Excel
+                        </button>
+                        <button onclick="exportWithFilters('csv')" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm">
+                            📄 View PDF
+                        </button>
+                        <a href="{{ route('admin.simple.export') }}" class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-sm">
+                            📄 Simple Export
+                        </a>
+                    </div>
+                </div>
+                
+                                
+                <!-- Current Filter Status -->
+                <div class="text-xs text-gray-600 bg-gray-100 p-2 rounded">
+                    <strong>Current Filters:</strong>
+                    @if(request('search')) <span class="ml-2">🔍 Search: {{ request('search') }}</span> @endif
+                    @if(request('date_from')) <span class="ml-2">📅 From: {{ request('date_from') }}</span> @endif
+                    @if(request('date_to')) <span class="ml-2">📅 To: {{ request('date_to') }}</span> @endif
+                    @if(request('division')) <span class="ml-2">🏢 Division: {{ request('division') }}</span> @endif
+                    @if(!request()->hasAny(['search', 'date_from', 'date_to', 'division'])) 
+                        <span class="ml-2 text-orange-600">⚠️ No filters applied - will export today's records only</span>
+                    @endif
+                </div>
             </div>
         </div>
+
+        <!-- JavaScript for Export with Filters -->
+        <script>
+        function exportWithFilters(type) {
+            console.log('Starting export with filters...');
+            
+            // Get current filter values from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const dateFrom = urlParams.get('date_from') || '';
+            const dateTo = urlParams.get('date_to') || '';
+            const division = urlParams.get('division') || '';
+            const search = urlParams.get('search') || '';
+            
+            console.log('Current filter values:', { dateFrom, dateTo, division, search });
+            
+            // Build export URL with current filters
+            let baseUrl;
+            if (type === 'excel') {
+                baseUrl = '{{ route('admin.export') }}';
+            } else {
+                baseUrl = '{{ route('admin.view.csv') }}';
+            }
+            
+            const params = new URLSearchParams();
+            if (dateFrom) params.append('date_from', dateFrom);
+            if (dateTo) params.append('date_to', dateTo);
+            if (division) params.append('division', division);
+            if (search) params.append('search', search);
+            
+            const exportUrl = baseUrl + '?' + params.toString();
+            
+            console.log('Export URL:', exportUrl);
+            
+            // Open in new window
+            window.open(exportUrl, '_blank');
+        }
+        </script>
 
         <!-- Today's Records Table -->
         <div>
