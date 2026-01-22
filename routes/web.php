@@ -15,6 +15,11 @@ Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// CSRF token refresh route for mobile
+Route::get('/csrf-token', function() {
+    return response()->json(['token' => csrf_token()]);
+})->name('csrf.token');
+
 // Time record routes (protected)
 Route::middleware('auth')->group(function () {
     Route::get('/time-in-out', [TimeRecordController::class, 'create'])->name('time-records.form');

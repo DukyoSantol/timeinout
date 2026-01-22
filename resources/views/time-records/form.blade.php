@@ -243,9 +243,41 @@
                     </div>
                 @endif
 
-                <form action="{{ route('time-records.store') }}" method="POST">
+                <form action="{{ route('time-records.store') }}" method="POST" id="timeTrackingForm">
                     @csrf
-                    @csrf
+                    
+                    <!-- Mobile Data Compatible Fix -->
+                    <input type="hidden" name="_method" value="POST">
+                    <input type="hidden" name="mobile_fix" value="1">
+                    
+                    <!-- CSRF Token Refresh for Mobile -->
+                    <script>
+                    // Refresh CSRF token every 5 minutes for mobile users
+                    setInterval(function() {
+                        fetch('{{ route("csrf.token") }}')
+                            .then(response => response.json())
+                            .then(data => {
+                                // Update all CSRF tokens in the form
+                                const csrfInputs = document.querySelectorAll('input[name="_token"]');
+                                csrfInputs.forEach(input => {
+                                    input.value = data.token;
+                                });
+                                console.log('CSRF token refreshed for mobile');
+                            })
+                            .catch(error => console.log('CSRF refresh failed:', error));
+                    }, 300000); // 5 minutes
+                    
+                    // Refresh token before form submission
+                    document.getElementById('timeTrackingForm').addEventListener('submit', function(e) {
+                        fetch('{{ route("csrf.token") }}')
+                            .then(response => response.json())
+                            .then(data => {
+                                document.querySelector('input[name="_token"]').value = data.token;
+                                console.log('CSRF token refreshed before submit');
+                            })
+                            .catch(error => console.log('Pre-submit CSRF refresh failed:', error));
+                    });
+                    </script>
                     
                     <!-- Time Tracking Buttons -->
                     <div class="mb-6">
