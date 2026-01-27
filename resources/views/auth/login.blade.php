@@ -1,49 +1,85 @@
-@extends('layouts.app')
-
-@section('title', 'MGB-XI Mining Portal Login')
-
-@section('content')
-<div class="min-h-screen w-full bg-gradient-to-br from-stone-900 via-stone-900 to-amber-900 relative overflow-hidden">
-    <!-- Mining Background Elements - TEST CHANGE -->
-    <div class="absolute inset-0 opacity-50">
-        <div class="absolute top-10 left-10 text-white opacity-50">
-            <svg class="w-4 h-4 transition-all duration-1000" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-            </svg>
-        </div>
-        <div class="absolute bottom-10 right-10 text-white opacity-40">
-            <svg class="w-12 h-12 transition-all duration-1500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6z"/>
-            </svg>
-        </div>
-        <div class="absolute top-1/2 left-1/4 text-white opacity-30">
-            <svg class="w-8 h-8 transition-all duration-2000" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-        </div>
-        <div class="absolute top-20 right-1/4 text-white opacity-40">
-            <svg class="w-10 h-10 transition-all duration-3000" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-        </div>
-        <div class="absolute bottom-20 left-1/3 text-white opacity-30">
-            <svg class="w-12 h-12 transition-all duration-2500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-        </div>
-        <div class="absolute top-1/3 right-1/3 text-white opacity-30">
-            <svg class="w-10 h-10 transition-all duration-1800" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-        </div>
-        <div class="absolute bottom-1/4 right-1/2 text-white opacity-25">
-            <svg class="w-12 h-12 transition-all duration-2200" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MGB-XI Mining Portal Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="m-0 p-0 overflow-hidden">
+    <!-- Full Screen Background -->
+    <div class="fixed inset-0 bg-gradient-to-br from-stone-900 via-stone-900 to-amber-900">
+        <!-- Mining Background Elements - Shrunk for Mobile -->
+        <div class="absolute inset-0 opacity-30">
+            <div class="absolute top-10 left-10 text-white opacity-30">
+                <svg class="w-3 h-3 transition-all duration-1000" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                </svg>
+            </div>
+            <div class="absolute bottom-10 right-10 text-white opacity-20">
+                <svg class="w-8 h-8 transition-all duration-1500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6z"/>
+                </svg>
+            </div>
+            <div class="absolute top-1/2 left-1/4 text-white opacity-20">
+                <svg class="w-6 h-6 transition-all duration-2000" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+            </div>
+            <div class="absolute top-20 right-1/4 text-white opacity-20">
+                <svg class="w-7 h-7 transition-all duration-3000" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+            </div>
+            <div class="absolute bottom-20 left-1/3 text-white opacity-20">
+                <svg class="w-8 h-8 transition-all duration-2500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+            </div>
+            <div class="absolute top-1/3 right-1/3 text-white opacity-20">
+                <svg class="w-7 h-7 transition-all duration-1800" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+            </div>
+            <div class="absolute bottom-1/4 right-1/2 text-white opacity-15">
+                <svg class="w-8 h-8 transition-all duration-2200" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+            </div>
         </div>
     </div>
 
-    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative z-10">
+    <!-- Navigation Overlay -->
+    <nav class="fixed top-0 left-0 right-0 backdrop-blur-sm text-white shadow-lg z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold">Online Time In_Out System</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ route('login') }}" class="hover:bg-amber-600/30 px-3 py-2 rounded text-sm font-medium transition-colors">
+                        Login
+                    </a>
+                    <a href="{{ route('register') }}" class="hover:bg-amber-600/30 px-3 py-2 rounded text-sm font-medium transition-colors">
+                        Register
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Form Overlay -->
+    <div class="fixed inset-0 flex items-center justify-center pt-24 px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="max-w-md w-full space-y-8">
         <!-- Logo and Title -->
         <div class="text-center">
@@ -173,6 +209,15 @@
         </form>
     </div>
     </div>
+
+    <!-- Footer Overlay -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-gray-800/80 backdrop-blur-sm text-white z-20">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p>&copy; {{ date('Y') }} Time In/Out System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 </div>
 
 <script>
@@ -212,4 +257,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endsection
+</body>
+</html>
