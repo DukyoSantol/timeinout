@@ -60,6 +60,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/users/{id}/change-password', [TimeRecordController::class, 'showChangePasswordForm'])->name('admin.users.change-password');
     Route::post('/users/{id}/change-password', [TimeRecordController::class, 'changePassword'])->name('admin.users.change-password.post');
     
+    // User Records
+    Route::get('/users/{id}/records', [TimeRecordController::class, 'userRecords'])->name('admin.users.records');
+    
     // User Records (Sidebar View)
     Route::get('/users/records-sidebar', [TimeRecordController::class, 'userRecordsSidebar'])->name('admin.users.sidebar');
     
