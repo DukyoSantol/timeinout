@@ -71,7 +71,7 @@ $totalHours = $totalHours ?? 0;
             <!-- Pagination for Users -->
             @if($users->hasPages())
             <div class="p-3 border-t border-gray-200 bg-gray-50">
-                {{ $users->links('pagination.simple') }}
+                {{ $users->links() }}
             </div>
             @endif
         </div>

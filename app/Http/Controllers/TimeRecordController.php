@@ -844,7 +844,6 @@ class TimeRecordController extends Controller
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Full Name</th>
                             <th>Position</th>
                             <th>Division</th>
@@ -870,7 +869,6 @@ class TimeRecordController extends Controller
                 
                 $htmlContent .= "
                     <tr>
-                        <td>" . $record->id . "</td>
                         <td>" . htmlspecialchars($record->full_name) . "</td>
                         <td>" . htmlspecialchars($record->position) . "</td>
                         <td>" . htmlspecialchars($record->division) . "</td>
