@@ -14,9 +14,10 @@ class TimeRecord extends Model
         'full_name',
         'position',
         'division',
-        'notes',
+        'target',
+        'accomplishment',
         'total_hours',
-        'status',  // New field for tracking status
+        'status',
         'morning_time_in',
         'morning_time_out',
         'afternoon_time_in',

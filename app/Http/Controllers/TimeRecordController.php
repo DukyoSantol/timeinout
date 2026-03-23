@@ -35,6 +35,32 @@ class TimeRecordController extends Controller
         return view('time-records.form');
     }
 
+    public function myTimeRecords(Request $request)
+    {
+        $query = TimeRecord::where('user_id', auth()->id());
+        
+        if ($request->has('date_from') && !empty($request->date_from)) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        
+        if ($request->has('date_to') && !empty($request->date_to)) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+        
+        if ($request->has('month') && !empty($request->month)) {
+            $date = Carbon::createFromFormat('Y-m', $request->month);
+            $query->whereMonth('created_at', $date->month)
+                  ->whereYear('created_at', $date->year);
+        }
+        
+        $records = $query->orderBy('created_at', 'desc')->paginate(15);
+        
+        $totalHours = $query->whereNotNull('total_hours')->sum('total_hours');
+        $totalRecords = $query->count();
+        
+        return view('time-records.my-records', compact('records', 'totalHours', 'totalRecords'));
+    }
+
     public function store(Request $request)
     {
         // Handle form actions
@@ -62,7 +88,6 @@ class TimeRecordController extends Controller
     
     private function handleMorningTimeIn(Request $request)
     {
-        // Find today's record or create new one
         $todayRecord = TimeRecord::where('user_id', auth()->id())
             ->whereDate('created_at', now()->format('Y-m-d'))
             ->first();
@@ -70,20 +95,20 @@ class TimeRecordController extends Controller
         $user = auth()->user();
         
         if ($todayRecord) {
-            // Update existing record with morning time in
             $todayRecord->update([
                 'morning_time_in' => $this->getManilaTime(),
-                'status' => 'TIMED_IN'
+                'status' => 'TIMED_IN',
+                'target' => $request->target ?? $todayRecord->target
             ]);
         } else {
-            // Create new morning time in record
             TimeRecord::create([
                 'user_id' => $user->id,
                 'full_name' => $user->name ?? 'Unknown User',
                 'position' => $user->position ?? 'Unknown Position',
                 'division' => $user->division ?? 'Unknown Division',
                 'morning_time_in' => $this->getManilaTime(),
-                'status' => 'TIMED_IN'
+                'status' => 'TIMED_IN',
+                'target' => $request->target
             ]);
         }
         
@@ -93,7 +118,6 @@ class TimeRecordController extends Controller
 
     private function handleMorningTimeOut(Request $request)
     {
-        // Find today's morning time in record
         $todayRecord = TimeRecord::where('user_id', auth()->id())
             ->whereDate('created_at', now()->format('Y-m-d'))
             ->whereNotNull('morning_time_in')
@@ -105,10 +129,9 @@ class TimeRecordController extends Controller
                 ->with('error', 'Please record morning time in first!');
         }
         
-        // Update morning time out and set status to available for afternoon session
         $todayRecord->update([
             'morning_time_out' => $this->getManilaTime(),
-            'status' => 'TIMED_IN' // Available for afternoon session
+            'status' => 'TIMED_IN'
         ]);
         
         return redirect()->route('time-records.form')
@@ -117,7 +140,6 @@ class TimeRecordController extends Controller
 
     private function handleAfternoonTimeIn(Request $request)
     {
-        // Find today's record
         $todayRecord = TimeRecord::where('user_id', auth()->id())
             ->whereDate('created_at', now()->format('Y-m-d'))
             ->first();
@@ -125,13 +147,11 @@ class TimeRecordController extends Controller
         $user = auth()->user();
         
         if ($todayRecord) {
-            // Update existing record
             $todayRecord->update([
                 'afternoon_time_in' => $this->getManilaTime(),
                 'status' => 'TIMED_IN'
             ]);
         } else {
-            // Create new afternoon time in record
             TimeRecord::create([
                 'user_id' => $user->id,
                 'full_name' => $user->name ?? 'Unknown User',
@@ -148,7 +168,6 @@ class TimeRecordController extends Controller
 
     private function handleAfternoonTimeOut(Request $request)
     {
-        // Find today's record
         $todayRecord = TimeRecord::where('user_id', auth()->id())
             ->whereDate('created_at', now()->format('Y-m-d'))
             ->whereNotNull('afternoon_time_in')
@@ -160,13 +179,12 @@ class TimeRecordController extends Controller
                 ->with('error', 'Please record afternoon time in first!');
         }
         
-        // Update afternoon time out and complete the day
         $todayRecord->update([
             'afternoon_time_out' => $this->getManilaTime(),
-            'status' => 'COMPLETED'
+            'status' => 'COMPLETED',
+            'accomplishment' => $request->accomplishment ?? $todayRecord->accomplishment
         ]);
         
-        // Calculate total hours
         $todayRecord->calculateTotalHours();
         
         return redirect()->route('time-records.form')
@@ -286,6 +304,104 @@ class TimeRecordController extends Controller
     }
 
     // User Management Methods
+    public function indexUsers(Request $request)
+    {
+        $query = User::query();
+        
+        if ($request->has('search') && !empty($request->get('search'))) {
+            $searchTerm = $request->get('search');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('email', 'like', "%{$searchTerm}%")
+                  ->orWhere('position', 'like', "%{$searchTerm}%")
+                  ->orWhere('division', 'like', "%{$searchTerm}%");
+            });
+        }
+        
+        if ($request->has('division') && !empty($request->get('division'))) {
+            $query->where('division', $request->get('division'));
+        }
+        
+        $users = $query->orderBy('name', 'asc')->paginate(15);
+        $divisions = User::distinct()->whereNotNull('division')->pluck('division');
+        
+        return view('admin.users.index', compact('users', 'divisions'));
+    }
+
+    public function userRecords($id, Request $request)
+    {
+        $user = User::findOrFail($id);
+        
+        $query = TimeRecord::where('user_id', $id);
+        
+        if ($request->has('date_from') && !empty($request->get('date_from'))) {
+            $query->whereDate('created_at', '>=', $request->get('date_from'));
+        }
+        
+        if ($request->has('date_to') && !empty($request->get('date_to'))) {
+            $query->whereDate('created_at', '<=', $request->get('date_to'));
+        }
+        
+        if ($request->has('month') && !empty($request->get('month'))) {
+            $date = \Carbon\Carbon::createFromFormat('Y-m', $request->get('month'));
+            $query->whereMonth('created_at', $date->month)
+                  ->whereYear('created_at', $date->year);
+        }
+        
+        $records = $query->orderBy('created_at', 'desc')->paginate(15);
+        $totalHours = $query->whereNotNull('total_hours')->sum('total_hours');
+        
+        return view('admin.users.records', compact('user', 'records', 'totalHours'));
+    }
+
+    public function userRecordsSidebar(Request $request)
+    {
+        $userQuery = User::query();
+        
+        if ($request->has('search') && !empty($request->get('search'))) {
+            $searchTerm = $request->get('search');
+            $userQuery->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('email', 'like', "%{$searchTerm}%")
+                  ->orWhere('position', 'like', "%{$searchTerm}%")
+                  ->orWhere('division', 'like', "%{$searchTerm}%");
+            });
+        }
+        
+        $users = $userQuery->orderBy('name', 'asc')->paginate(20);
+        
+        $selectedUser = null;
+        $selectedUserRecords = collect();
+        $totalHours = 0;
+        
+        if ($request->has('user_id') && !empty($request->get('user_id'))) {
+            $selectedUser = User::find($request->get('user_id'));
+            
+            if ($selectedUser) {
+                $recordsQuery = TimeRecord::where('user_id', $selectedUser->id);
+                
+                if ($request->has('date_from') && !empty($request->get('date_from'))) {
+                    $recordsQuery->whereDate('created_at', '>=', $request->get('date_from'));
+                }
+                
+                if ($request->has('date_to') && !empty($request->get('date_to'))) {
+                    $recordsQuery->whereDate('created_at', '<=', $request->get('date_to'));
+                }
+                
+                if ($request->has('month') && !empty($request->get('month'))) {
+                    $date = \Carbon\Carbon::createFromFormat('Y-m', $request->get('month'));
+                    $recordsQuery->whereMonth('created_at', $date->month)
+                                  ->whereYear('created_at', $date->year);
+                }
+                
+                $selectedUserRecords = $recordsQuery->orderBy('created_at', 'desc')->paginate(15);
+                $totalHours = $recordsQuery->whereNotNull('total_hours')->sum('total_hours');
+            }
+        }
+        
+        return view('admin.users.sidebar', compact('users', 'selectedUser', 'selectedUserRecords', 'totalHours'));
+    }
+
     public function timeRecordsIndex(Request $request)
     {
         $query = TimeRecord::query();

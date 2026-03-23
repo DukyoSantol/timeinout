@@ -3,23 +3,26 @@
 @section('title', 'MGB-XI Online Time In/Out Form')
 
 @section('content')
-<div class="max-w-2xl mx-auto">
-    <div class="bg-white shadow-lg rounded-lg p-6">
+<div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-6">
+        <!-- Left Panel - Main Form -->
+        <div class="xl:col-span-2">
+            <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
         <!-- System Time Display -->
-        <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+        <div class="mb-4 sm:mb-6 bg-gradient-to-r from-blue-500 to-blue-600 border-l-4 border-blue-400 p-3 sm:p-4 rounded-lg">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-600">Current System Time</p>
-                    <p class="text-2xl font-bold text-gray-800">
+                    <p class="text-xs sm:text-sm text-blue-100">Current System Time</p>
+                    <p id="systemTime" class="text-lg sm:text-2xl font-bold text-white">
                         {{ \Carbon\Carbon::now('Asia/Manila')->format('l, F j, Y h:i:s A') }}
                     </p>
                 </div>
-                <div class="text-4xl">🕐</div>
+                <div class="text-2xl sm:text-4xl">🕐</div>
             </div>
         </div>
 
         @if(auth()->check())
-        <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
+        <div class="mb-4 sm:mb-6 bg-green-50 border-l-4 border-green-500 p-3 sm:p-4 rounded-lg">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
                     <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
@@ -27,9 +30,9 @@
                     </div>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm text-gray-600">Welcome!</p>
-                    <p class="text-lg font-bold text-gray-800">{{ auth()->user()->name }}</p>
-                    <p class="text-sm text-gray-500">{{ auth()->user()->position }} - {{ auth()->user()->division }}</p>
+                    <p class="text-xs sm:text-sm text-gray-600">Welcome!</p>
+                    <p class="text-base sm:text-lg font-bold text-gray-800">{{ auth()->user()->name }}</p>
+                    <p class="text-xs sm:text-sm text-gray-500">{{ auth()->user()->position }} - {{ auth()->user()->division }}</p>
                 </div>
             </div>
         </div>
@@ -112,19 +115,6 @@
                         ->sum('total_hours');
                 @endphp
             @endif
-
-            <div>
-                <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
-                    Notes (Optional)
-                </label>
-                <textarea 
-                    id="notes" 
-                    name="notes" 
-                    rows="3"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Add any notes about your workday..."
-                >{{ old('notes') }}</textarea>
-            </div>
 
             <!-- Incomplete Records Warning -->
             @if(auth()->check())
@@ -240,6 +230,19 @@
                                 </div>
                             </div>
                         @endif
+
+                        <!-- Notes Display -->
+                        @if($latestRecord->notes)
+                            <div class="mt-4 bg-yellow-50 p-3 rounded-lg border border-yellow-300">
+                                <div class="flex items-start">
+                                    <span class="text-lg mr-2">📝</span>
+                                    <div>
+                                        <span class="text-sm font-semibold text-yellow-800">Notes:</span>
+                                        <p class="text-sm text-yellow-700 mt-1">{{ $latestRecord->notes }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 @endif
 
@@ -278,69 +281,79 @@
                             .catch(error => console.log('Pre-submit CSRF refresh failed:', error));
                     });
                     </script>
-                    
+
                     <!-- Time Tracking Buttons -->
-                    <div class="mb-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Time Tracking</h3>
+                    <div class="mb-4 sm:mb-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-800 flex items-center mb-2 sm:mb-0">
+                                <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Time Tracking
+                            </h3>
+                            <a href="{{ route('user.time-records') }}" class="btn-elegant flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg text-xs sm:text-sm transition-all duration-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span>My Records</span>
+                            </a>
+                        </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                             <!-- Morning Session -->
-                            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
-                                <h4 class="text-md font-medium text-green-800 mb-3">🌅 Morning Session</h4>
-                                <div class="flex space-x-2">
+                            <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 sm:p-6 rounded-xl border border-green-200 shadow-sm hover:shadow-lg transition-all duration-300">
+                                <h4 class="text-base sm:text-lg font-bold text-green-800 mb-3 sm:mb-4 flex items-center">
+                                    <span class="text-xl sm:text-2xl mr-2">🌅</span> Morning Session
+                                </h4>
+                                <div class="grid grid-cols-2 gap-2 sm:gap-3">
                                     <button 
-                                        type="submit" 
-                                        name="action" 
-                                        value="morning_time_in"
+                                        type="button"
+                                        onclick="openTargetModal()"
                                         {{ !$canMorningTimeIn ? 'disabled' : '' }}
-                                        class="flex-1 px-4 py-3 {{ $canMorningTimeIn ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed' }} text-white rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                                        class="btn-elegant btn-glow-green flex items-center justify-center px-3 sm:px-4 py-3 sm:py-4 {{ $canMorningTimeIn ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700' : 'bg-gray-400 cursor-not-allowed' }} text-white font-bold rounded-lg transition-all duration-300 text-sm sm:text-base"
                                     >
-                                        🕐 Morning Time In
+                                        <span class="mr-1 sm:mr-2">🕐</span> <span class="hidden xs:inline">Morning </span>Time In
                                     </button>
                                     <button 
                                         type="submit" 
                                         name="action" 
                                         value="morning_time_out"
                                         {{ !$canMorningTimeOut ? 'disabled' : '' }}
-                                        class="flex-1 px-4 py-3 {{ $canMorningTimeOut ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-400 cursor-not-allowed' }} text-white rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors"
+                                        class="btn-elegant btn-glow-orange flex items-center justify-center px-3 sm:px-4 py-3 sm:py-4 {{ $canMorningTimeOut ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700' : 'bg-gray-400 cursor-not-allowed' }} text-white font-bold rounded-lg transition-all duration-300 text-sm sm:text-base"
                                     >
-                                        🕕 Morning Time Out
+                                        <span class="mr-1 sm:mr-2">🕕</span> <span class="hidden xs:inline">Morning </span>Time Out
                                     </button>
                                 </div>
                             </div>
 
                             <!-- Afternoon Session -->
-                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                                <h4 class="text-md font-medium text-blue-800 mb-3">🌆 Afternoon Session</h4>
-                                <div class="flex space-x-2">
+                            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 sm:p-6 rounded-xl border border-blue-200 shadow-sm hover:shadow-lg transition-all duration-300">
+                                <h4 class="text-base sm:text-lg font-bold text-blue-800 mb-3 sm:mb-4 flex items-center">
+                                    <span class="text-xl sm:text-2xl mr-2">🌆</span> Afternoon Session
+                                </h4>
+                                <div class="grid grid-cols-2 gap-2 sm:gap-3">
                                     <button 
                                         type="submit" 
                                         name="action" 
                                         value="afternoon_time_in"
                                         {{ !$canAfternoonTimeIn ? 'disabled' : '' }}
-                                        class="flex-1 px-4 py-3 {{ $canAfternoonTimeIn ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed' }} text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                                        class="btn-elegant btn-glow-blue flex items-center justify-center px-3 sm:px-4 py-3 sm:py-4 {{ $canAfternoonTimeIn ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700' : 'bg-gray-400 cursor-not-allowed' }} text-white font-bold rounded-lg transition-all duration-300 text-sm sm:text-base"
                                     >
-                                        🕐 Afternoon Time In
+                                        <span class="mr-1 sm:mr-2">🕐</span> <span class="hidden xs:inline">Afternoon </span>Time In
                                     </button>
                                     <button 
-                                        type="submit" 
-                                        name="action" 
-                                        value="afternoon_time_out"
+                                        type="button"
+                                        onclick="openAccomplishmentModal()"
                                         {{ !$canAfternoonTimeOut ? 'disabled' : '' }}
-                                        class="flex-1 px-4 py-3 {{ $canAfternoonTimeOut ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-400 cursor-not-allowed' }} text-white rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors"
+                                        class="btn-elegant btn-glow-purple flex items-center justify-center px-3 sm:px-4 py-3 sm:py-4 {{ $canAfternoonTimeOut ? 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700' : 'bg-gray-400 cursor-not-allowed' }} text-white font-bold rounded-lg transition-all duration-300 text-sm sm:text-base"
                                     >
-                                        🕕 Afternoon Time Out
+                                        <span class="mr-1 sm:mr-2">🕕</span> <span class="hidden xs:inline">Afternoon </span>Time Out
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Notes Section -->
-                    
-
-                    <!-- Submit Button -->
-                    
                 </form>
             @else
                 <div class="text-center py-8">
@@ -352,94 +365,215 @@
                     </a>
                 </div>
             @endif
+            </div>
         </div>
     </div>
 </div>
 
-@push('scripts')
+<!-- Target Modal -->
+<div id="targetModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-2xl p-6 m-4 max-w-md w-full shadow-2xl">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-green-700 flex items-center">
+                <span class="text-2xl mr-2">🎯</span> Target/Work for the Day
+            </h3>
+            <button onclick="closeTargetModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <form action="{{ route('time-records.store') }}" method="POST" id="targetForm">
+            @csrf
+            <input type="hidden" name="action" value="morning_time_in">
+            <div class="mb-4">
+                <label for="target" class="block text-sm font-medium text-gray-700 mb-2">
+                    What are your targets/work for today?
+                </label>
+                <textarea 
+                    id="target" 
+                    name="target" 
+                    rows="4"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="Enter your targets/work for the day..."
+                    required
+                ></textarea>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="closeTargetModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow transition-colors">
+                    <span class="mr-2">🕐</span> Time In
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Accomplishment Modal -->
+<div id="accomplishmentModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-2xl p-6 m-4 max-w-md w-full shadow-2xl">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-purple-700 flex items-center">
+                <span class="text-2xl mr-2">✅</span> Accomplishment of the Day
+            </h3>
+            <button onclick="closeAccomplishmentModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <form action="{{ route('time-records.store') }}" method="POST" id="accomplishmentForm">
+            @csrf
+            <input type="hidden" name="action" value="afternoon_time_out">
+            <div class="mb-4">
+                <label for="accomplishment" class="block text-sm font-medium text-gray-700 mb-2">
+                    What did you accomplish today?
+                </label>
+                <textarea 
+                    id="accomplishment" 
+                    name="accomplishment" 
+                    rows="4"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="Enter your accomplishments for the day..."
+                    required
+                ></textarea>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="closeAccomplishmentModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow transition-colors">
+                    <span class="mr-2">🕕</span> Time Out
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
 (function() {
     'use strict';
     
-    // Wait for DOM to be ready
-    function waitForElement() {
-        const element = document.getElementById('systemTime');
-        if (element) {
-            console.log('systemTime element found:', element);
-            return element;
-        }
-        console.log('Waiting for systemTime element...');
-        setTimeout(waitForElement, 100);
-    }
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     
-    // Update time function
-    function updateTime() {
-        const correctTime = new Date('2026-01-15T16:53:00+08:00');
+    function formatTime(date) {
+        const dayName = days[date.getDay()];
+        const monthName = months[date.getMonth()];
+        const dateNum = date.getDate();
+        const year = date.getFullYear();
         
-        // Manual formatting to avoid any browser issues
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        
-        const dayName = days[correctTime.getDay()];
-        const monthName = months[correctTime.getMonth()];
-        const date = correctTime.getDate();
-        const year = correctTime.getFullYear();
-        
-        let hours = correctTime.getHours();
-        const minutes = correctTime.getMinutes().toString().padStart(2, '0');
-        const seconds = correctTime.getSeconds().toString().padStart(2, '0');
+        let hours = date.getHours();
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const seconds = date.getSeconds().toString().padStart(2, '0');
         const ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12;
         hours = hours ? hours : 12;
         
-        const formattedTime = dayName + ', ' + monthName + ' ' + date + ', ' + year + ' ' + hours + ':' + minutes + ':' + seconds + ' ' + ampm;
-        
-        // Multiple update methods to ensure it works
+        return dayName + ', ' + monthName + ' ' + dateNum + ', ' + year + ' ' + hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+    }
+    
+    function updateTime() {
+        const element = document.getElementById('systemTime');
         if (element) {
-            element.textContent = formattedTime;
-            element.innerText = formattedTime;
-            element.innerHTML = formattedTime;
-            element.style.color = '#0066cc';
-            element.style.backgroundColor = '#ffffcc';
-            element.style.border = '2px solid #0066cc';
-            
-            console.log('Time updated to:', formattedTime);
-            console.log('Element methods used:', {
-                textContent: element.textContent,
-                innerText: element.innerText,
-                innerHTML: element.innerHTML
-            });
+            const now = new Date();
+            element.textContent = formatTime(now);
         }
     }
     
-    // Start the time display
-    function startTimeDisplay() {
-        console.log('Starting bulletproof time display...');
-        
-        const element = waitForElement();
-        if (element) {
-            // Update immediately
-            updateTime();
-            
-            // Update every second
-            setInterval(updateTime, 1000);
-            
-            // Also update every 5 seconds for extra reliability
-            setInterval(updateTime, 5000);
-            
-            console.log('Time display started with multiple intervals');
-        } else {
-            console.error('Failed to find systemTime element after 10 seconds');
-        }
-    }
-    
-    // Start when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', startTimeDisplay);
-    } else {
-        startTimeDisplay();
-    }
+    updateTime();
+    setInterval(updateTime, 1000);
 })();
+
+// Modal Functions
+let pendingAction = null;
+
+function openTargetModal() {
+    fetch('{{ route("csrf.token") }}')
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector('#targetForm input[name="_token"]').value = data.token;
+        });
+    pendingAction = 'target';
+    const modal = document.getElementById('targetModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeTargetModal() {
+    const modal = document.getElementById('targetModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.classList.remove('overflow-hidden');
+}
+
+function openAccomplishmentModal() {
+    fetch('{{ route("csrf.token") }}')
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector('#accomplishmentForm input[name="_token"]').value = data.token;
+        });
+    pendingAction = 'accomplishment';
+    const modal = document.getElementById('accomplishmentModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeAccomplishmentModal() {
+    const modal = document.getElementById('accomplishmentModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.classList.remove('overflow-hidden');
+}
+
+// Close modal on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeTargetModal();
+        closeAccomplishmentModal();
+    }
+});
+
+// Close modal on overlay click
+document.getElementById('targetModal').addEventListener('click', function(e) {
+    if (e.target === this) closeTargetModal();
+});
+
+document.getElementById('accomplishmentModal').addEventListener('click', function(e) {
+    if (e.target === this) closeAccomplishmentModal();
+});
+
+// Handle form submissions with CSRF refresh
+document.getElementById('targetForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    fetch('{{ route("csrf.token") }}')
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector('#targetForm input[name="_token"]').value = data.token;
+            document.getElementById('targetForm').submit();
+        })
+        .catch(error => {
+            document.getElementById('targetForm').submit();
+        });
+});
+
+document.getElementById('accomplishmentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    fetch('{{ route("csrf.token") }}')
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector('#accomplishmentForm input[name="_token"]').value = data.token;
+            document.getElementById('accomplishmentForm').submit();
+        })
+        .catch(error => {
+            document.getElementById('accomplishmentForm').submit();
+        });
+});
 </script>
-@endpush
 @endsection

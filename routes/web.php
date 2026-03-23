@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TimeRecordController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -48,6 +49,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/time-records/time-out-user', [TimeRecordController::class, 'timeOutUser'])->name('time-records.time-out-user');
     Route::post('/check-timed-in-status', [TimeRecordController::class, 'checkTimedInStatus'])->name('time-records.check-timed-in-status');
     Route::get('/time-records/get-current-time', [TimeRecordController::class, 'getCurrentTime'])->name('time-records.get-current-time');
+    
+    // User profile routes
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/change-password', [ProfileController::class, 'showChangePassword'])->name('profile.change-password');
+    Route::put('/profile/change-password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');
+    
+    // User time records routes
+    Route::get('/my-time-records', [TimeRecordController::class, 'myTimeRecords'])->name('user.time-records');
 });
 
 // Admin routes (protected + admin check)
@@ -87,4 +97,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/filter', [TimeRecordController::class, 'filter'])->name('admin.time-records.filter');
     Route::get('/users/{id}/change-password', [TimeRecordController::class, 'showChangePasswordForm'])->name('admin.users.change-password');
     Route::post('/users/{id}/change-password', [TimeRecordController::class, 'changePassword'])->name('admin.users.change-password.post');
+    Route::get('/users/{id}/records', [TimeRecordController::class, 'userRecords'])->name('admin.users.records');
+    Route::get('/users/records-sidebar', [TimeRecordController::class, 'userRecordsSidebar'])->name('admin.users.sidebar');
 });

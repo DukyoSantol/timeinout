@@ -210,16 +210,6 @@
     </div>
     </div>
 
-    <!-- Footer Overlay -->
-    <footer class="fixed bottom-0 left-0 right-0 bg-gray-800/80 backdrop-blur-sm text-white z-20">
-        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <p>&copy; {{ date('Y') }} Time In/Out System. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-</div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Login page loaded - setting up password toggle');
