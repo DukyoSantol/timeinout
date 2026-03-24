@@ -147,7 +147,7 @@
         </div>
 
         <!-- Login Form -->
-        <form class="mt-8 space-y-6 bg-stone-800/50 backdrop-blur-sm rounded-xl p-8 shadow-2xl border border-stone-700 animate-float-form" action="{{ route('login') }}" method="POST">
+        <form class="mt-8 space-y-6 bg-stone-800/80 backdrop-blur-md rounded-2xl p-8 border border-amber-500/30 floating-card" action="{{ route('login') }}" method="POST">
             @csrf
             @if ($errors->any())
                 <div class="rounded-md bg-red-900/50 border border-red-800 p-4">
@@ -354,6 +354,13 @@
             50% { transform: translateY(-10px); }
         }
         .animate-float-form {
+            animation: float-form 4s ease-in-out infinite;
+        }
+        .floating-card {
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(245, 158, 11, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
             animation: float-form 4s ease-in-out infinite;
         }
         @keyframes float-slow {
