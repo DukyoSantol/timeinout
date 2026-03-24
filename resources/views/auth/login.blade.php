@@ -329,55 +329,6 @@
                 </div>
             </div>
 
-            <!-- Faded Gold and Silver Effects Under Login -->
-            <div class="mt-8 relative h-16 overflow-hidden">
-                <!-- Faded Gold Nuggets -->
-                <div class="absolute animate-float-slow" style="left: 15%; top: 30%; opacity: 0.15;">
-                    <svg class="w-6 h-6 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-                    </svg>
-                </div>
-                <div class="absolute animate-float-medium" style="left: 35%; top: 50%; opacity: 0.12;">
-                    <svg class="w-5 h-5 text-amber-300" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-                    </svg>
-                </div>
-                <div class="absolute animate-float-fast" style="left: 55%; top: 25%; opacity: 0.18;">
-                    <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-                    </svg>
-                </div>
-                <div class="absolute animate-float-slow" style="left: 75%; top: 60%; opacity: 0.1;">
-                    <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-                    </svg>
-                </div>
-                
-                <!-- Faded Silver Ores -->
-                <div class="absolute animate-float-medium" style="left: 25%; top: 65%; opacity: 0.12;">
-                    <svg class="w-6 h-6 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                    </svg>
-                </div>
-                <div class="absolute animate-float-fast" style="left: 45%; top: 35%; opacity: 0.1;">
-                    <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                    </svg>
-                </div>
-                <div class="absolute animate-float-slow" style="left: 65%; top: 20%; opacity: 0.15;">
-                    <svg class="w-4 h-4 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                    </svg>
-                </div>
-                <div class="absolute animate-float-medium" style="left: 85%; top: 45%; opacity: 0.11;">
-                    <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </div>
-
             <div class="text-center">
                 <p class="text-sm text-amber-300">
                     Department of Environment and Natural Resources
