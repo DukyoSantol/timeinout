@@ -19,8 +19,58 @@
 <body class="m-0 p-0">
     <!-- Full Screen Background -->
     <div class="fixed inset-0 bg-gradient-to-br from-stone-900 via-stone-900 to-amber-900">
-        <!-- Mining Background Elements - Shrunk for Mobile -->
+        <!-- Mining Background Elements with Gold and Silver Effects -->
         <div class="absolute inset-0 opacity-30">
+            <!-- Gold Nuggets - Animated -->
+            <div class="absolute animate-float-slow" style="left: 10%; top: 15%;">
+                <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                </svg>
+            </div>
+            <div class="absolute animate-float-medium" style="right: 15%; top: 25%;">
+                <svg class="w-5 h-5 text-amber-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                </svg>
+            </div>
+            <div class="absolute animate-float-fast" style="left: 25%; bottom: 20%;">
+                <svg class="w-3 h-3 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                </svg>
+            </div>
+            <div class="absolute animate-float-slow" style="right: 25%; bottom: 30%;">
+                <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                </svg>
+            </div>
+            <div class="absolute animate-float-medium" style="left: 50%; top: 40%;">
+                <svg class="w-3 h-3 text-amber-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                </svg>
+            </div>
+            
+            <!-- Silver Ores - Animated -->
+            <div class="absolute animate-float-medium" style="left: 15%; top: 40%;">
+                <svg class="w-5 h-5 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                </svg>
+            </div>
+            <div class="absolute animate-float-fast" style="right: 30%; top: 15%;">
+                <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                </svg>
+            </div>
+            <div class="absolute animate-float-slow" style="left: 35%; bottom: 35%;">
+                <svg class="w-5 h-5 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                </svg>
+            </div>
+            <div class="absolute animate-float-medium" style="right: 10%; bottom: 15%;">
+                <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                </svg>
+            </div>
+            
+            <!-- Static Background Elements -->
             <div class="absolute top-10 left-10 text-white opacity-30">
                 <svg class="w-3 h-3 transition-all duration-1000" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
@@ -325,6 +375,8 @@
                     </svg>
                 </div>
             </div>
+        </div>
+    </div>
 
             <div class="text-center">
                 <p class="text-sm text-amber-300">
