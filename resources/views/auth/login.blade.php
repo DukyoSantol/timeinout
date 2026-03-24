@@ -361,7 +361,6 @@
                 0 10px 40px rgba(0, 0, 0, 0.5),
                 0 0 20px rgba(245, 158, 11, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            animation: float-form 4s ease-in-out infinite;
         }
         @keyframes float-slow {
             0%, 100% { transform: translateY(0) rotate(0deg); }
