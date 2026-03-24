@@ -367,6 +367,47 @@
             @endif
             </div>
         </div>
+        
+        <!-- Right Panel - Notes -->
+        <div class="xl:col-span-1">
+            <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    Notes
+                </h3>
+                @if(auth()->check())
+                    @php
+                        $todayRecords = auth()->user()->timeRecords()->whereDate('created_at', now()->format('Y-m-d'))->orderBy('created_at', 'desc')->get();
+                        $hasAnyAfternoonTimeOut = $todayRecords->whereNotNull('afternoon_time_out')->isNotEmpty();
+                        $latestRecord = $todayRecords->first();
+                    @endphp
+                    
+                    <form action="{{ route('time-records.store') }}" method="POST" id="notesForm">
+                        @csrf
+                        <input type="hidden" name="action" value="save_notes">
+                        <div class="mb-4">
+                            <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
+                                Add notes for today
+                            </label>
+                            <textarea 
+                                id="notes" 
+                                name="notes" 
+                                rows="6"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                                placeholder="Enter your notes..."
+                            >{{ $latestRecord->notes ?? '' }}</textarea>
+                        </div>
+                        <button type="submit" class="w-full px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-semibold rounded-lg shadow transition-colors">
+                            <span class="mr-2">💾</span> Save Notes
+                        </button>
+                    </form>
+                @else
+                    <p class="text-gray-500 text-sm">Please log in to add notes.</p>
+                @endif
+            </div>
+        </div>
     </div>
 </div>
 

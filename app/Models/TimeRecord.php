@@ -16,6 +16,7 @@ class TimeRecord extends Model
         'division',
         'target',
         'accomplishment',
+        'notes',
         'total_hours',
         'status',
         'morning_time_in',
@@ -79,20 +80,6 @@ class TimeRecord extends Model
         }
         
         $totalHours = $totalMinutes / 60;
-        
-        // Debug logging
-        \Log::info('Total Hours Calculation Debug', [
-            'earliest_time' => $earliestTime ? $earliestTime->format('H:i:s') : null,
-            'latest_time' => $latestTime ? $latestTime->format('H:i:s') : null,
-            'total_minutes' => $totalMinutes,
-            'total_hours' => $totalHours,
-            'times' => [
-                'morning_time_in' => $this->morning_time_in ? $this->morning_time_in->format('H:i:s') : null,
-                'morning_time_out' => $this->morning_time_out ? $this->morning_time_out->format('H:i:s') : null,
-                'afternoon_time_in' => $this->afternoon_time_in ? $this->afternoon_time_in->format('H:i:s') : null,
-                'afternoon_time_out' => $this->afternoon_time_out ? $this->afternoon_time_out->format('H:i:s') : null,
-            ]
-        ]);
         
         $this->total_hours = round($totalHours, 2);
         $this->save();
@@ -173,7 +160,6 @@ class TimeRecord extends Model
             }
         } catch (\Exception $e) {
             // If column doesn't exist, just ignore
-            \Log::info('timed_in_flag column not found: ' . $e->getMessage());
         }
     }
 

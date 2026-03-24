@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\TimeRecord;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use DateTime;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -77,6 +77,8 @@ class TimeRecordController extends Controller
                 return $this->handleAfternoonTimeIn($request);
             } elseif ($action === 'afternoon_time_out') {
                 return $this->handleAfternoonTimeOut($request);
+            } elseif ($action === 'save_notes') {
+                return $this->handleSaveNotes($request);
             } else {
                 return redirect()->route('time-records.form')
                     ->with('error', 'Invalid action specified');
@@ -189,6 +191,30 @@ class TimeRecordController extends Controller
         
         return redirect()->route('time-records.form')
             ->with('success', 'Afternoon time out recorded successfully! Day completed.');
+    }
+
+    private function handleSaveNotes(Request $request)
+    {
+        $todayRecord = TimeRecord::where('user_id', auth()->id())
+            ->whereDate('created_at', now()->format('Y-m-d'))
+            ->first();
+
+        if (!$todayRecord) {
+            return redirect()->route('time-records.form')
+                ->with('error', 'Please time in first before adding notes!');
+        }
+
+        if ($todayRecord->afternoon_time_out) {
+            return redirect()->route('time-records.form')
+                ->with('error', 'Cannot save notes - day is already complete!');
+        }
+
+        $todayRecord->update([
+            'notes' => $request->notes
+        ]);
+
+        return redirect()->route('time-records.form')
+            ->with('success', 'Notes saved successfully!');
     }
     
     private function handleSubmit(Request $request)
@@ -560,24 +586,8 @@ class TimeRecordController extends Controller
 
     public function getCurrentTime()
     {
-        // Force timezone and correct time
-        date_default_timezone_set('Asia/Manila');
-        
-        // Create correct time manually
-        $correctTime = new \DateTime('2026-01-15 16:17:00', new \DateTimeZone('Asia/Manila'));
-        $formattedTime = $correctTime->format('l, F j, Y g:i:s A');
-        
-        \Log::info('getCurrentTime returning: ' . $formattedTime);
-        \Log::info('Timezone set to: ' . date_default_timezone_get());
-        
         return response()->json([
-            'time' => $formattedTime,
-            'debug' => [
-                'type' => 'timezone_override',
-                'timezone' => date_default_timezone_get(),
-                'correct_time' => $formattedTime,
-                'datetime_object' => $correctTime->format('Y-m-d H:i:s')
-            ]
+            'time' => now()->setTimezone('Asia/Manila')->format('l, F j, Y g:i:s A')
         ]);
     }
 
@@ -604,14 +614,6 @@ class TimeRecordController extends Controller
     public function dashboard(Request $request)
     {
         $query = TimeRecord::query();
-        
-        // Debug: Log the request parameters
-        \Log::info('Dashboard request parameters:', [
-            'search' => $request->get('search'),
-            'date_from' => $request->get('date_from'),
-            'date_to' => $request->get('date_to'),
-            'division' => $request->get('division'),
-        ]);
         
         // Apply filters
         if ($request->has('search') && !empty($request->get('search'))) {
@@ -650,13 +652,6 @@ class TimeRecordController extends Controller
         $activeRecords = TimeRecord::active()->orderBy('morning_time_in', 'desc')->get();
         $divisions = TimeRecord::distinct('division')->pluck('division');
         
-        // Debug: Log the results
-        \Log::info('Dashboard results:', [
-            'todayRecords_count' => $todayRecords->count(),
-            'activeRecords_count' => $activeRecords->count(),
-            'divisions' => $divisions->toArray(),
-        ]);
-        
         $totalToday = $todayRecords->count();
         $totalActive = $activeRecords->count();
         $totalHoursToday = $todayRecords->whereNotNull('total_hours')->sum('total_hours');
@@ -683,13 +678,6 @@ class TimeRecordController extends Controller
     public function deleteRecord(Request $request, $id)
     {
         $record = TimeRecord::findOrFail($id);
-        
-        // Log the deletion
-        \Log::info('Deleting time record:', [
-            'id' => $id,
-            'user_id' => $record->user_id,
-            'full_name' => $record->full_name,
-        ]);
         
         $record->delete();
         
@@ -753,37 +741,11 @@ class TimeRecordController extends Controller
     public function viewCsv()
     {
         try {
-            // Debug: Log everything about the request
-            \Log::info('=== PDF EXPORT DEBUG START ===');
-            \Log::info('Full request URL: ' . request()->fullUrl());
-            \Log::info('Query string: ' . request()->getQueryString());
-            \Log::info('All request data: ' . json_encode(request()->all()));
-            \Log::info('Request method: ' . request()->method());
-            
             // Get date filters from request or session
             $dateFrom = request('date_from') ?: session('export_filters.date_from');
             $dateTo = request('date_to') ?: session('export_filters.date_to');
             $search = request('search') ?: session('export_filters.search');
             $division = request('division') ?: session('export_filters.division');
-            
-            \Log::info('Parameters from request/session:', [
-                'date_from' => $dateFrom,
-                'date_to' => $dateTo,
-                'search' => $search,
-                'division' => $division,
-                'session_filters' => session('export_filters')
-            ]);
-            
-            // Debug logging
-            \Log::info('PDF Export Debug', [
-                'date_from' => $dateFrom,
-                'date_to' => $dateTo,
-                'search' => $search,
-                'division' => $division,
-                'all_request_params' => request()->all(),
-                'full_url' => request()->fullUrl(),
-                'query_string' => request()->getQueryString()
-            ]);
             
             // Build query with filters
             $query = TimeRecord::query();
@@ -797,14 +759,12 @@ class TimeRecordController extends Controller
             if ($dateFrom && !empty($dateFrom)) {
                 if (strtotime($dateFrom)) {
                     $query->whereDate('created_at', '>=', $dateFrom);
-                    \Log::info('Applied date_from filter: ' . $dateFrom);
                 }
             }
             
             if ($dateTo && !empty($dateTo)) {
                 if (strtotime($dateTo)) {
                     $query->whereDate('created_at', '<=', $dateTo);
-                    \Log::info('Applied date_to filter: ' . $dateTo);
                 }
             }
             
@@ -816,15 +776,11 @@ class TimeRecordController extends Controller
             // If no filters provided, show only today's records
             if (!$dateFrom && !$dateTo && !$search && !$division) {
                 $today = now()->format('Y-m-d');
-                \Log::info('No filters provided, defaulting to today: ' . $today);
                 $query->whereDate('created_at', $today);
             }
             
             $records = $query->orderBy('created_at', 'desc')->get();
 
-            // Log success
-            \Log::info('PDF Export successful, records found: ' . $records->count());
-            \Log::info('Final SQL Query: ' . $query->toSql());
             // Create HTML content for PDF
             $htmlContent = "
             <html>
@@ -970,12 +926,9 @@ class TimeRecordController extends Controller
             
             session(['export_filters' => $filters]);
             
-            \Log::info('Export filters stored in session:', $filters);
-            
             return response()->json(['success' => true, 'filters' => $filters]);
             
         } catch (\Exception $e) {
-            \Log::error('Failed to store export filters: ' . $e->getMessage());
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
@@ -983,35 +936,14 @@ class TimeRecordController extends Controller
     public function exportTimeRecords(Request $request)
     {
         try {
-            // Debug: Log everything about the request
-            \Log::info('=== EXPORT DEBUG START ===');
-            \Log::info('Full request URL: ' . $request->fullUrl());
-            \Log::info('Query string: ' . $request->getQueryString());
-            \Log::info('All request data: ' . json_encode($request->all()));
-            \Log::info('Request method: ' . $request->method());
-            \Log::info('Is ajax: ' . ($request->ajax() ? 'yes' : 'no'));
-            
-            // Build query - simplified version for debugging
+            // Build query
             $query = TimeRecord::query();
             
-            // Log request parameters for debugging
+            // Get date filters from request or session
             $dateFrom = request('date_from') ?: session('export_filters.date_from');
             $dateTo = request('date_to') ?: session('export_filters.date_to');
             $search = request('search') ?: session('export_filters.search');
             $division = request('division') ?: session('export_filters.division');
-            
-            \Log::info('Excel Export parameters from request/session:', [
-                'date_from' => $dateFrom,
-                'date_to' => $dateTo,
-                'search' => $search,
-                'division' => $division,
-                'has_search' => $request->has('search'),
-                'has_date_from' => $request->has('date_from'),
-                'has_date_to' => $request->has('date_to'),
-                'has_division' => $request->has('division'),
-                'all_params' => $request->all(),
-                'session_filters' => session('export_filters')
-            ]);
             
             // Apply filters with better validation
             if ($request->has('search') && !empty($request->get('search'))) {
@@ -1041,19 +973,11 @@ class TimeRecordController extends Controller
             // If no filters applied, show only today's records
             if (!$request->has('search') && !$request->has('date_from') && !$request->has('date_to') && !$request->has('division')) {
                 $today = now()->format('Y-m-d');
-                \Log::info('No export filters provided, defaulting to today: ' . $today);
                 $query->whereDate('created_at', $today);
             }
             
             // Get records
             $records = $query->orderBy('created_at', 'desc')->get();
-            
-            // Log success with query details
-            \Log::info('Excel Export query successful:', [
-                'records_found' => $records->count(),
-                'sql_query' => $query->toSql(),
-                'query_bindings' => $query->getBindings()
-            ]);
             
             // Prepare CSV data
             $csvData = [];
