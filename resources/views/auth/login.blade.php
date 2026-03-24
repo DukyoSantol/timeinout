@@ -117,10 +117,10 @@
                     <h1 class="text-xl font-bold text-white animate-bounce-slow">Online Time In_Out System</h1>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <a href="{{ route('login') }}" class="hover:bg-amber-600/30 px-3 py-2 rounded text-sm font-medium transition-colors text-white">
+                    <a href="{{ route('login') }}" class="px-3 py-2 rounded text-sm font-bold text-white hover:text-red-400 transition-colors">
                         Login
                     </a>
-                    <a href="{{ route('register') }}" class="hover:bg-amber-600/30 px-3 py-2 rounded text-sm font-medium transition-colors text-white">
+                    <a href="{{ route('register') }}" class="px-3 py-2 rounded text-sm font-bold text-white hover:text-red-400 transition-colors">
                         Register
                     </a>
                 </div>
