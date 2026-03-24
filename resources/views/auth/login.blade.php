@@ -64,7 +64,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <h1 class="text-xl font-bold">Online Time In_Out System</h1>
+                    <h1 class="text-xl font-bold animate-bounce-slow">Online Time In_Out System</h1>
                 </div>
                 <div class="flex items-center space-x-3">
                     <a href="{{ route('login') }}" class="hover:bg-amber-600/30 px-3 py-2 rounded text-sm font-medium transition-colors">
@@ -198,6 +198,134 @@
                 </button>
             </div>
 
+            <!-- Mining Effects Footer -->
+            <div class="mt-8 relative h-24 overflow-hidden rounded-lg bg-stone-900/30 border border-stone-700">
+                <!-- Gold Nuggets -->
+                <div class="absolute animate-float-slow" style="left: 10%; top: 50%;">
+                    <svg class="w-4 h-4 text-amber-400 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-medium" style="left: 25%; top: 30%;">
+                    <svg class="w-3 h-3 text-amber-300 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-fast" style="left: 45%; top: 60%;">
+                    <svg class="w-5 h-5 text-amber-500 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-slow" style="left: 65%; top: 40%;">
+                    <svg class="w-3 h-3 text-yellow-300 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-medium" style="left: 80%; top: 70%;">
+                    <svg class="w-4 h-4 text-amber-400 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </div>
+                
+                <!-- Silver Ores -->
+                <div class="absolute animate-float-medium" style="left: 15%; top: 70%;">
+                    <svg class="w-4 h-4 text-slate-300 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-fast" style="left: 35%; top: 20%;">
+                    <svg class="w-3 h-3 text-slate-400 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-slow" style="left: 55%; top: 80%;">
+                    <svg class="w-5 h-5 text-slate-300 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-medium" style="left: 75%; top: 25%;">
+                    <svg class="w-3 h-3 text-gray-300 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-fast" style="left: 90%; top: 55%;">
+                    <svg class="w-4 h-4 text-slate-400 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    </svg>
+                </div>
+                
+                <!-- Pickaxe Icons -->
+                <div class="absolute animate-float-slow" style="left: 5%; top: 20%;">
+                    <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-medium" style="right: 10%; top: 30%;">
+                    <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
+                    </svg>
+                </div>
+                
+                <!-- Sparkle Effects -->
+                <div class="absolute animate-ping" style="left: 30%; top: 50%;">
+                    <svg class="w-2 h-2 text-amber-300" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-ping" style="left: 70%; top: 40%; animation-delay: 1s;">
+                    <svg class="w-2 h-2 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Faded Gold and Silver Effects Under Login -->
+            <div class="mt-8 relative h-16 overflow-hidden">
+                <!-- Faded Gold Nuggets -->
+                <div class="absolute animate-float-slow" style="left: 15%; top: 30%; opacity: 0.15;">
+                    <svg class="w-6 h-6 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-medium" style="left: 35%; top: 50%; opacity: 0.12;">
+                    <svg class="w-5 h-5 text-amber-300" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-fast" style="left: 55%; top: 25%; opacity: 0.18;">
+                    <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-slow" style="left: 75%; top: 60%; opacity: 0.1;">
+                    <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </div>
+                
+                <!-- Faded Silver Ores -->
+                <div class="absolute animate-float-medium" style="left: 25%; top: 65%; opacity: 0.12;">
+                    <svg class="w-6 h-6 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-fast" style="left: 45%; top: 35%; opacity: 0.1;">
+                    <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-slow" style="left: 65%; top: 20%; opacity: 0.15;">
+                    <svg class="w-4 h-4 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    </svg>
+                </div>
+                <div class="absolute animate-float-medium" style="left: 85%; top: 45%; opacity: 0.11;">
+                    <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    </svg>
+                </div>
+            </div>
+
             <div class="text-center">
                 <p class="text-sm text-amber-300">
                     Department of Environment and Natural Resources
@@ -209,6 +337,31 @@
         </form>
     </div>
     </div>
+
+    <style>
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-bounce-slow {
+            animation: bounce-slow 3s ease-in-out infinite;
+        }
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        @keyframes float-medium {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(-5deg); }
+        }
+        @keyframes float-fast {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(3deg); }
+        }
+        .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
+        .animate-float-medium { animation: float-medium 4s ease-in-out infinite; }
+        .animate-float-fast { animation: float-fast 3s ease-in-out infinite; }
+    </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
