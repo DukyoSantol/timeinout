@@ -29,9 +29,8 @@ class AutoTimeOut extends Command
     {
         $this->info('Starting auto time out process...');
         
-        // Find all incomplete records from previous days
+        // Find all incomplete records including today
         $incompleteRecords = TimeRecord::whereNull('afternoon_time_out')
-            ->whereDate('created_at', '<', now()->format('Y-m-d'))
             ->get();
         
         $count = 0;
@@ -40,7 +39,8 @@ class AutoTimeOut extends Command
             // Set time out to 11:59 PM of the created_at day in Manila timezone
             $timeOut = $record->created_at->copy()->setTimezone('Asia/Manila')->setTime(23, 59, 59);
             $record->afternoon_time_out = $timeOut;
-            $record->status = 'COMPLETED';
+            $record->status = 'INCOMPLETE';
+            $record->auto_completed = true;
             $record->calculateTotalHours();
             $record->save();
             

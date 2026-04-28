@@ -15,10 +15,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // Run auto time out at midnight every day
+        // Run auto time out at 23:59 daily to catch all incomplete records
         $schedule->command('auto:timeout')
             ->dailyAt('23:59')
-            ->description('Auto time out incomplete records at midnight');
+            ->description('Auto time out incomplete records at 23:59');
     }
 
     /**

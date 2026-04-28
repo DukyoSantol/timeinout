@@ -116,6 +116,32 @@
             </div>
 
             <div>
+                <label for="target" class="block text-sm font-medium text-gray-700 mb-2">
+                    Target (Optional)
+                </label>
+                <textarea 
+                    id="target" 
+                    name="target" 
+                    rows="2"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter target for the day..."
+                >{{ old('target', $record->target) }}</textarea>
+            </div>
+
+            <div>
+                <label for="accomplishment" class="block text-sm font-medium text-gray-700 mb-2">
+                    Accomplishment (Optional)
+                </label>
+                <textarea 
+                    id="accomplishment" 
+                    name="accomplishment" 
+                    rows="2"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter accomplishment for the day..."
+                >{{ old('accomplishment', $record->accomplishment) }}</textarea>
+            </div>
+
+            <div>
                 <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
                     Notes (Optional)
                 </label>

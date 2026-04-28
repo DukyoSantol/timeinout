@@ -137,19 +137,19 @@
                         <td class="px-4 py-3"><span class="inline-flex px-2 py-1 rounded-full text-xs font-bold {{ $record->afternoon_time_in ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600' }}">{{ $record->afternoon_time_in ? $record->afternoon_time_in->format('h:i A') : '--:--' }}</span></td>
                         <td class="px-4 py-3"><span class="inline-flex px-2 py-1 rounded-full text-xs font-bold {{ $record->afternoon_time_out ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-600' }}">{{ $record->afternoon_time_out ? $record->afternoon_time_out->format('h:i A') : '--:--' }}</span></td>
                         <td class="px-4 py-3"><span class="inline-flex px-2 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">{{ $record->total_hours ? $record->getTotalHoursAsTime() : '--' }}</span></td>
-                        <td class="px-4 py-3 max-w-xs">
+                        <td class="px-4 py-3">
                             @if($record->target)
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800" title="{{ $record->target }}">
-                                    🎯 {{ Str::limit($record->target, 25) }}
+                                <span class="inline-block px-2 py-1 rounded-lg text-xs font-medium bg-green-100 text-green-800">
+                                    🎯 {{ $record->target }}
                                 </span>
                             @else
                                 <span class="text-gray-400 text-xs">--</span>
                             @endif
                         </td>
-                        <td class="px-4 py-3 max-w-xs">
+                        <td class="px-4 py-3">
                             @if($record->accomplishment)
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800" title="{{ $record->accomplishment }}">
-                                    ✅ {{ Str::limit($record->accomplishment, 25) }}
+                                <span class="inline-block px-2 py-1 rounded-lg text-xs font-medium bg-purple-100 text-purple-800">
+                                    ✅ {{ $record->accomplishment }}
                                 </span>
                             @else
                                 <span class="text-gray-400 text-xs">--</span>
@@ -158,6 +158,8 @@
                         <td class="px-4 py-3">
                             @if($record->status === 'COMPLETED')
                                 <span class="inline-flex px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">Complete</span>
+                            @elseif($record->status === 'INCOMPLETE')
+                                <span class="inline-flex px-2 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800">Incomplete</span>
                             @elseif($record->status === 'TIMED_IN')
                                 <span class="inline-flex px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">In Progress</span>
                             @else
@@ -194,6 +196,8 @@
                     </div>
                     @if($record->status === 'COMPLETED')
                         <span class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">Complete</span>
+                    @elseif($record->status === 'INCOMPLETE')
+                        <span class="px-2 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800">Incomplete</span>
                     @elseif($record->status === 'TIMED_IN')
                         <span class="px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">In Progress</span>
                     @else

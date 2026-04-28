@@ -19,6 +19,7 @@ class TimeRecord extends Model
         'notes',
         'total_hours',
         'status',
+        'auto_completed',
         'morning_time_in',
         'morning_time_out',
         'afternoon_time_in',
@@ -42,6 +43,13 @@ class TimeRecord extends Model
 
     public function calculateTotalHours()
     {
+        // Skip calculation for INCOMPLETE records (auto-completed at 11:59)
+        if ($this->status === 'INCOMPLETE') {
+            $this->total_hours = 0;
+            $this->save();
+            return 0;
+        }
+        
         $totalHours = 0;
         
         // Get all valid times and find earliest and latest

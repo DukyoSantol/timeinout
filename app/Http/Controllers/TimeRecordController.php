@@ -35,8 +35,107 @@ class TimeRecordController extends Controller
         return view('time-records.form');
     }
 
+    private function autoCompleteMissedTimeOuts($userId)
+    {
+        $now = $this->getManilaTime();
+        
+        // Auto-complete records from previous days (definitely past 11:59 PM)
+        $missedRecords = TimeRecord::where('user_id', $userId)
+            ->whereNull('afternoon_time_out')
+            ->whereDate('created_at', '<', $now->format('Y-m-d'))
+            ->get();
+        
+        foreach ($missedRecords as $record) {
+            $timeOut = $record->created_at->copy()->setTimezone('Asia/Manila')->setTime(23, 59, 59);
+            $record->afternoon_time_out = $timeOut;
+            $record->status = 'INCOMPLETE';
+            $record->auto_completed = true;
+            $record->calculateTotalHours();
+            $record->save();
+        }
+        
+        // Also check today's record if it's past 11:59 PM
+        if ($now->format('H:i:s') >= '23:59:00') {
+            $todayRecord = TimeRecord::where('user_id', $userId)
+                ->whereDate('created_at', $now->format('Y-m-d'))
+                ->whereNull('afternoon_time_out')
+                ->first();
+            
+            if ($todayRecord) {
+                $todayRecord->afternoon_time_out = $now->copy()->setTime(23, 59, 59);
+                $todayRecord->status = 'INCOMPLETE';
+                $todayRecord->auto_completed = true;
+                $todayRecord->calculateTotalHours();
+                $todayRecord->save();
+            }
+        }
+    }
+
+    private function autoCompleteMissedTimeOutsForAllUsers()
+    {
+        $now = $this->getManilaTime();
+        
+        // Fix records that have 23:59 time out but wrong status
+        $this->fixIncorrectStatusForAutoCompleted();
+        
+        // Only auto-complete if current time is past 11:59 PM
+        if ($now->format('H:i:s') >= '23:59:00') {
+            // Get all users with missed time outs today
+            $missedToday = TimeRecord::whereNull('afternoon_time_out')
+                ->whereDate('created_at', $now->format('Y-m-d'))
+                ->get();
+            
+            foreach ($missedToday as $record) {
+                $record->afternoon_time_out = $now->copy()->setTime(23, 59, 59);
+                $record->status = 'INCOMPLETE';
+                $record->auto_completed = true;
+                $record->total_hours = 0; // Incomplete = no hours
+                $record->save();
+            }
+        }
+        
+        // Auto-complete all previous days' missed time outs
+        $missedPrevious = TimeRecord::whereNull('afternoon_time_out')
+            ->whereDate('created_at', '<', $now->format('Y-m-d'))
+            ->get();
+        
+        foreach ($missedPrevious as $record) {
+            $timeOut = $record->created_at->copy()->setTimezone('Asia/Manila')->setTime(23, 59, 59);
+            $record->afternoon_time_out = $timeOut;
+            $record->status = 'INCOMPLETE';
+            $record->auto_completed = true;
+            $record->total_hours = 0; // Incomplete = no hours
+            $record->save();
+        }
+    }
+    
+    private function fixIncorrectStatusForAutoCompleted()
+    {
+        // Find records where afternoon_time_out is at 23:59 but status is not INCOMPLETE
+        $records = TimeRecord::whereNotNull('afternoon_time_out')
+            ->where(function($query) {
+                $query->where('status', '!=', 'INCOMPLETE')
+                      ->orWhereNull('status');
+            })
+            ->get();
+        
+        foreach ($records as $record) {
+            // Check if the time is 23:59 (allowing for slight variations)
+            $timeOut = $record->afternoon_time_out;
+            if ($timeOut && ($timeOut->format('H:i') === '23:59' || $timeOut->format('H:i:s') === '23:59:00')) {
+                $record->status = 'INCOMPLETE';
+                $record->auto_completed = true;
+                $record->total_hours = 0; // Incomplete = no hours
+                $record->save();
+            }
+        }
+    }
+
     public function myTimeRecords(Request $request)
     {
+        // Auto-complete forgotten afternoon time outs (before 11:59 PM cutoff)
+        $this->autoCompleteMissedTimeOuts(auth()->id());
+        
         $query = TimeRecord::where('user_id', auth()->id());
         
         if ($request->has('date_from') && !empty($request->date_from)) {
@@ -55,7 +154,10 @@ class TimeRecordController extends Controller
         
         $records = $query->orderBy('created_at', 'desc')->paginate(15);
         
-        $totalHours = $query->whereNotNull('total_hours')->sum('total_hours');
+        // Exclude INCOMPLETE records from total hours
+        $totalHours = $query->where('status', '!=', 'INCOMPLETE')
+            ->whereNotNull('total_hours')
+            ->sum('total_hours');
         $totalRecords = $query->count();
         
         return view('time-records.my-records', compact('records', 'totalHours', 'totalRecords'));
@@ -382,6 +484,9 @@ class TimeRecordController extends Controller
 
     public function userRecordsSidebar(Request $request)
     {
+        // Auto-complete missed time outs for all users
+        $this->autoCompleteMissedTimeOutsForAllUsers();
+        
         $userQuery = User::query();
         
         if ($request->has('search') && !empty($request->get('search'))) {
@@ -613,6 +718,9 @@ class TimeRecordController extends Controller
 
     public function dashboard(Request $request)
     {
+        // Auto-complete missed time outs for all users
+        $this->autoCompleteMissedTimeOutsForAllUsers();
+        
         $query = TimeRecord::query();
         
         // Apply filters
@@ -654,7 +762,10 @@ class TimeRecordController extends Controller
         
         $totalToday = $todayRecords->count();
         $totalActive = $activeRecords->count();
-        $totalHoursToday = $todayRecords->whereNotNull('total_hours')->sum('total_hours');
+        // Exclude INCOMPLETE records from total hours
+        $totalHoursToday = $todayRecords->where('status', '!=', 'INCOMPLETE')
+            ->whereNotNull('total_hours')
+            ->sum('total_hours');
         
         // Calculate total hours per user
         $totalHoursPerUser = TimeRecord::whereNotNull('total_hours')
@@ -718,6 +829,8 @@ class TimeRecordController extends Controller
             'morning_time_out' => 'nullable|date|after:morning_time_in',
             'afternoon_time_in' => 'nullable|date',
             'afternoon_time_out' => 'nullable|date|after:afternoon_time_in',
+            'target' => 'nullable|string|max:1000',
+            'accomplishment' => 'nullable|string|max:1000',
             'notes' => 'nullable|string|max:1000'
         ]);
 

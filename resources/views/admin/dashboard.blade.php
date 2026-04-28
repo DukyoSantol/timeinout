@@ -208,15 +208,13 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $record->total_hours ? number_format($record->total_hours, 2) : '-' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                @if($record->status === 'COMPLETED')
-                                    <span class="inline-flex px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">Complete</span>
-                                @elseif($record->status === 'TIMED_IN')
-                                    <span class="inline-flex px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">In Progress</span>
-                                @else
-                                    <span class="inline-flex px-2 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-800">Pending</span>
-                                @endif
-                            </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            @if($record->status === 'INCOMPLETE')
+                                --
+                            @else
+                                {{ $record->total_hours ? number_format($record->total_hours, 2) : '-' }}
+                            @endif
+                        </td>
                         </tr>
                         @empty
                             <tr>
