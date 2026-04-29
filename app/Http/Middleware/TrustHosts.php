@@ -14,6 +14,7 @@ class TrustHosts extends Middleware
     public function hosts()
     {
         return [
+            '202.137.120.23',
             $this->allSubdomainsOfApplicationUrl(),
         ];
     }
