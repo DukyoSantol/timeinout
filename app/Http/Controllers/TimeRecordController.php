@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\TimeRecord;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use DateTime;
@@ -192,28 +193,46 @@ class TimeRecordController extends Controller
     
     private function handleMorningTimeIn(Request $request)
     {
-        $todayRecord = TimeRecord::where('user_id', auth()->id())
-            ->whereDate('created_at', now()->format('Y-m-d'))
-            ->first();
-        
         $user = auth()->user();
+        $today = $this->getManilaTime()->format('Y-m-d');
         
-        if ($todayRecord) {
-            $todayRecord->update([
-                'morning_time_in' => $this->getManilaTime(),
-                'status' => 'TIMED_IN',
-                'target' => $request->target ?? $todayRecord->target
-            ]);
-        } else {
-            TimeRecord::create([
-                'user_id' => $user->id,
-                'full_name' => $user->name ?? 'Unknown User',
-                'position' => $user->position ?? 'Unknown Position',
-                'division' => $user->division ?? 'Unknown Division',
-                'morning_time_in' => $this->getManilaTime(),
-                'status' => 'TIMED_IN',
-                'target' => $request->target
-            ]);
+        try {
+            $todayRecord = TimeRecord::where('user_id', $user->id)
+                ->whereDate('created_at', $today)
+                ->first();
+            
+            if ($todayRecord) {
+                $todayRecord->update([
+                    'morning_time_in' => $this->getManilaTime(),
+                    'status' => 'TIMED_IN',
+                    'target' => $request->target ?? $todayRecord->target
+                ]);
+            } else {
+                TimeRecord::create([
+                    'user_id' => $user->id,
+                    'full_name' => $user->name ?? 'Unknown User',
+                    'position' => $user->position ?? 'Unknown Position',
+                    'division' => $user->division ?? 'Unknown Division',
+                    'morning_time_in' => $this->getManilaTime(),
+                    'status' => 'TIMED_IN',
+                    'target' => $request->target
+                ]);
+            }
+        } catch (QueryException $e) {
+            if ($e->getCode() == 23000) {
+                $existing = TimeRecord::where('user_id', $user->id)
+                    ->whereDate('created_at', $today)
+                    ->first();
+                if ($existing) {
+                    $existing->update([
+                        'morning_time_in' => $this->getManilaTime(),
+                        'status' => 'TIMED_IN',
+                        'target' => $request->target ?? $existing->target
+                    ]);
+                }
+            } else {
+                throw $e;
+            }
         }
         
         return redirect()->route('time-records.form')
@@ -244,26 +263,43 @@ class TimeRecordController extends Controller
 
     private function handleAfternoonTimeIn(Request $request)
     {
-        $todayRecord = TimeRecord::where('user_id', auth()->id())
-            ->whereDate('created_at', now()->format('Y-m-d'))
-            ->first();
-        
         $user = auth()->user();
+        $today = $this->getManilaTime()->format('Y-m-d');
         
-        if ($todayRecord) {
-            $todayRecord->update([
-                'afternoon_time_in' => $this->getManilaTime(),
-                'status' => 'TIMED_IN'
-            ]);
-        } else {
-            TimeRecord::create([
-                'user_id' => $user->id,
-                'full_name' => $user->name ?? 'Unknown User',
-                'position' => $user->position ?? 'Unknown Position',
-                'division' => $user->division ?? 'Unknown Division',
-                'afternoon_time_in' => $this->getManilaTime(),
-                'status' => 'TIMED_IN'
-            ]);
+        try {
+            $todayRecord = TimeRecord::where('user_id', $user->id)
+                ->whereDate('created_at', $today)
+                ->first();
+            
+            if ($todayRecord) {
+                $todayRecord->update([
+                    'afternoon_time_in' => $this->getManilaTime(),
+                    'status' => 'TIMED_IN'
+                ]);
+            } else {
+                TimeRecord::create([
+                    'user_id' => $user->id,
+                    'full_name' => $user->name ?? 'Unknown User',
+                    'position' => $user->position ?? 'Unknown Position',
+                    'division' => $user->division ?? 'Unknown Division',
+                    'afternoon_time_in' => $this->getManilaTime(),
+                    'status' => 'TIMED_IN'
+                ]);
+            }
+        } catch (QueryException $e) {
+            if ($e->getCode() == 23000) {
+                $existing = TimeRecord::where('user_id', $user->id)
+                    ->whereDate('created_at', $today)
+                    ->first();
+                if ($existing) {
+                    $existing->update([
+                        'afternoon_time_in' => $this->getManilaTime(),
+                        'status' => 'TIMED_IN'
+                    ]);
+                }
+            } else {
+                throw $e;
+            }
         }
         
         return redirect()->route('time-records.form')
@@ -339,19 +375,23 @@ class TimeRecordController extends Controller
             $validated['division'] = $user->division ?? 'Unknown Division';
             
             // Store time record
-            $timeRecord = TimeRecord::create($validated);
+            try {
+                $timeRecord = TimeRecord::create($validated);
+            } catch (QueryException $e) {
+                if ($e->getCode() == 23000) {
+                    return redirect()->route('time-records.form')
+                        ->with('error', 'A record for today already exists.');
+                }
+                throw $e;
+            }
             
             // Set status based on whether afternoon_time_out is provided
             if (!$request->afternoon_time_out) {
-                // Time In only - set status to TIMED_IN
                 $timeRecord->status = 'TIMED_IN';
                 $timeRecord->save();
             } else {
-                // Time Out provided - set status to COMPLETED
                 $timeRecord->status = 'COMPLETED';
                 $timeRecord->save();
-                
-                // Calculate total hours
                 $timeRecord->calculateTotalHours();
             }
             
@@ -374,19 +414,23 @@ class TimeRecordController extends Controller
             }
             
             // Store time record
-            $timeRecord = TimeRecord::create($validated);
+            try {
+                $timeRecord = TimeRecord::create($validated);
+            } catch (QueryException $e) {
+                if ($e->getCode() == 23000) {
+                    return redirect()->route('time-records.form')
+                        ->with('error', 'A record for today already exists.');
+                }
+                throw $e;
+            }
             
             // Set status based on whether afternoon_time_out is provided
             if (!$request->afternoon_time_out) {
-                // Time In only - set status to TIMED_IN
                 $timeRecord->status = 'TIMED_IN';
                 $timeRecord->save();
             } else {
-                // Time Out provided - set status to COMPLETED
                 $timeRecord->status = 'COMPLETED';
                 $timeRecord->save();
-                
-                // Calculate total hours
                 $timeRecord->calculateTotalHours();
             }
             
@@ -581,13 +625,20 @@ class TimeRecordController extends Controller
             'division' => 'nullable|string|max:255',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'position' => $request->position,
-            'division' => $request->division,
-        ]);
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'position' => $request->position,
+                'division' => $request->division,
+            ]);
+        } catch (QueryException $e) {
+            if ($e->getCode() == 23000) {
+                return back()->withErrors(['email' => 'This email is already taken.'])->withInput();
+            }
+            throw $e;
+        }
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User created successfully!');

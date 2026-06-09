@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -50,13 +51,20 @@ class AuthController extends Controller
             'division' => 'required|string|max:255',
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'position' => $validated['position'],
-            'division' => $validated['division'],
-        ]);
+        try {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'position' => $validated['position'],
+                'division' => $validated['division'],
+            ]);
+        } catch (QueryException $e) {
+            if ($e->getCode() == 23000) {
+                return back()->withErrors(['email' => 'This email is already registered.'])->withInput();
+            }
+            throw $e;
+        }
 
         Auth::login($user);
 

@@ -11,6 +11,7 @@ class TimeRecord extends Model
 
     protected $fillable = [
         'user_id',
+        'record_date',
         'full_name',
         'position',
         'division',
@@ -35,6 +36,16 @@ class TimeRecord extends Model
         'afternoon_time_in' => 'datetime',
         'afternoon_time_out' => 'datetime'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (!$model->record_date) {
+                $model->record_date = now()->format('Y-m-d');
+            }
+        });
+    }
 
     public function user()
     {
